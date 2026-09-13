@@ -17,7 +17,7 @@ int main() {
         std::cout << "2 - Расширенный алгоритм Евклида\n";
         std::cout << "3 - Обратное число по модулю\n";
         std::cout << "4 - Протокол Шамира\n";
-        std::cout << "4.1 - Шифрование файла\n";
+        std::cout << "5 - Шифрование файла\n";
         std::cout << "0 - Выход\n";
         std::cout << "Выбор: ";
         std::cin >> choice;
@@ -46,20 +46,44 @@ int main() {
                 continue;
             }
 
-            std::cout << "\np простое, значит a^" << p - 1
-                      << " = 1 (mod " << p << ")\n";
-            std::cout << "поэтому x = " << x << " можно заменить на "
-                      << x % (p - 1) << "\n";
+            std::cout << "\nШаг 1. Проверка условий теоремы Ферма\n";
+            std::cout << "p = " << p << " простое, НОД(" << a << ", " << p
+                      << ") = 1\n";
+            std::cout << "значит a^" << p - 1 << " = 1 (mod " << p << ")\n";
 
-            std::vector<int64_t> steps;
-            int64_t answer = modpow_fermat(a, x, p, steps);
+            std::cout << "\nШаг 2. Сокращение показателя по модулю p-1\n";
+            std::cout << x << " mod " << p - 1 << " = " << x % (p - 1) << "\n";
+            std::cout << "поэтому " << a << "^" << x << " = " << a << "^"
+                      << x % (p - 1) << " (mod " << p << ")\n";
 
-            std::cout << "\nШаги бинарного возведения:\n";
-            for (size_t i = 0; i < steps.size(); i++) {
-                std::cout << "шаг " << i + 1 << ": " << steps[i] << "\n";
+            std::vector<int64_t> bits;
+            std::vector<int64_t> bases;
+            std::vector<int64_t> results;
+
+            int64_t answer = modpow_fermat(a, x, p, bits, bases, results);
+
+            std::cout << "\nШаг 3. Двоичное разложение показателя "
+                      << x % (p - 1) << ": ";
+            for (size_t i = bits.size(); i > 0; i--) {
+                std::cout << bits[i - 1];
+            }
+            std::cout << " (младший бит справа)\n";
+
+            std::cout << "\nШаг 4. Бинарное возведение в степень\n";
+            std::cout << "шаг | бит | основание | результат\n";
+            for (size_t i = 0; i < bits.size(); i++) {
+                std::cout << i + 1 << "   |  " << bits[i] << "  | "
+                          << bases[i] << " | " << results[i];
+                if (bits[i] == 1) {
+                    std::cout << "  <- бит 1, умножаем";
+                } else {
+                    std::cout << "  <- бит 0, пропускаем";
+                }
+                std::cout << "\n";
             }
 
-            std::cout << "\nОтвет: " << answer << "\n";
+            std::cout << "\nОтвет: " << a << "^" << x << " mod " << p
+                      << " = " << answer << "\n";
         }
 
         //2
@@ -71,13 +95,24 @@ int main() {
             std::cout << "b = ";
             std::cin >> b;
 
+            std::vector<int64_t> qs, rs, us, vs;
             int64_t u, v;
-            int64_t g = ext_gcd(a, b, u, v);
+            int64_t g = ext_gcd_table(a, b, qs, rs, us, vs, u, v);
 
+            std::cout << "\nТаблица расширенного алгоритма Евклида\n";
+            std::cout << "шаг | q | r | u | v\n";
+            for (size_t i = 0; i < qs.size(); i++) {
+                std::cout << i + 1 << "   | " << qs[i] << " | " << rs[i]
+                          << " | " << us[i] << " | " << vs[i] << "\n";
+            }
+
+            std::cout << "\nОстаток стал равен 0, последний ненулевой остаток "
+                      << "и есть НОД\n";
             std::cout << "НОД(" << a << ", " << b << ") = " << g << "\n";
             std::cout << "u = " << u << ", v = " << v << "\n";
-            std::cout << "Проверка: " << a << "*" << u << " + "
-                      << b << "*" << v << " = " << a * u + b * v << "\n";
+            std::cout << "Проверка (тождество Безу): " << a << "*" << u
+                      << " + " << b << "*" << v << " = "
+                      << a * u + b * v << "\n";
         }
 
         //3
@@ -89,16 +124,39 @@ int main() {
             std::cout << "m = ";
             std::cin >> m;
 
+            std::vector<int64_t> qs, rs, us, vs;
             bool exists;
-            int64_t d = mod_inverse(c, m, exists);
+            int64_t u_raw;
+            int64_t d = mod_inverse_table(c, m, exists, qs, rs, us, vs, u_raw);
+
+            std::cout << "\nТаблица расширенного алгоритма Евклида\n";
+            std::cout << "шаг | q | r | u | v\n";
+            for (size_t i = 0; i < qs.size(); i++) {
+                std::cout << i + 1 << "   | " << qs[i] << " | " << rs[i]
+                          << " | " << us[i] << " | " << vs[i] << "\n";
+            }
 
             if (!exists) {
-                std::cout << "Обратного числа не существует, НОД(" << c
-                          << ", " << m << ") не равен 1\n";
+                std::cout << "\nНОД(" << c << ", " << m
+                          << ") не равен 1, обратного числа не существует\n";
                 continue;
             }
 
-            std::cout << "d = " << d << "\n";
+            std::cout << "\nНОД(" << c << ", " << m << ") = 1, значит "
+                      << "обратное число существует\n";
+            std::cout << "из тождества Безу: " << c << "*" << u_raw
+                      << " + " << m << "*k = 1\n";
+            std::cout << "берём коэффициент при c: u = " << u_raw << "\n";
+
+            if (u_raw < 0) {
+                std::cout << "u отрицательное, приводим к диапазону [0, "
+                          << m - 1 << "]: " << u_raw << " + " << m
+                          << " = " << d << "\n";
+            } else {
+                std::cout << "u уже в диапазоне [0, " << m - 1 << "]\n";
+            }
+
+            std::cout << "\nd = " << d << "\n";
             std::cout << "Проверка: " << c << "*" << d << " mod " << m
                       << " = " << c * d % m << "\n";
         }
@@ -134,28 +192,40 @@ int main() {
                 continue;
             }
 
-            std::cout << "dA = " << dA << ", dB = " << dB << "\n";
+            std::cout << "\nКлючи считаются по модулю p-1 = " << p - 1
+                      << ", так как показатели степени\n";
+            std::cout << "живут по модулю p-1 (следствие теоремы Ферма)\n";
+            std::cout << "dA = " << dA << " (проверка: " << cA << "*" << dA
+                      << " mod " << p - 1 << " = " << cA * dA % (p - 1) << ")\n";
+            std::cout << "dB = " << dB << " (проверка: " << cB << "*" << dB
+                      << " mod " << p - 1 << " = " << cB * dB % (p - 1) << ")\n";
+
+            std::cout << "\nПередача сообщения в четыре прохода:\n";
 
             int64_t x1 = shamir_step(m, cA, p);
-            std::cout << "x1 = " << x1 << "  (Алиса -> Боб)\n";
+            std::cout << "x1 = " << m << "^" << cA << " mod " << p << " = "
+                      << x1 << "  (Алиса -> Боб)\n";
 
             int64_t x2 = shamir_step(x1, cB, p);
-            std::cout << "x2 = " << x2 << "  (Боб -> Алиса)\n";
+            std::cout << "x2 = " << x1 << "^" << cB << " mod " << p << " = "
+                      << x2 << "  (Боб -> Алиса)\n";
 
             int64_t x3 = shamir_step(x2, dA, p);
-            std::cout << "x3 = " << x3 << "  (Алиса -> Боб)\n";
+            std::cout << "x3 = " << x2 << "^" << dA << " mod " << p << " = "
+                      << x3 << "  (Алиса -> Боб)\n";
 
             int64_t x4 = shamir_step(x3, dB, p);
-            std::cout << "x4 = " << x4 << "  (расшифровано)\n";
+            std::cout << "x4 = " << x3 << "^" << dB << " mod " << p << " = "
+                      << x4 << "  (Боб расшифровал)\n";
 
             if (x4 == m) {
-                std::cout << "Успех: сообщение восстановлено\n";
+                std::cout << "\nУспех: сообщение восстановлено\n";
             } else {
-                std::cout << "Ошибка: не совпало с исходным\n";
+                std::cout << "\nОшибка: не совпало с исходным\n";
             }
         }
 
-        //4.1
+        //5
         if (choice == 5) {
             std::string name;
             int64_t p, cA, cB;
@@ -183,6 +253,8 @@ int main() {
                 continue;
             }
 
+            std::cout << "dA = " << dA << ", dB = " << dB << "\n";
+
             std::vector<int64_t> bytes = read_file_bytes(name);
             if (bytes.size() == 0) {
                 std::cout << "файл пуст или не найден\n";
@@ -196,6 +268,15 @@ int main() {
                 int64_t x2 = shamir_step(x1, cB, p);
                 int64_t x3 = shamir_step(x2, dA, p);
                 enc.push_back(x3);
+
+                if (i < 5) {
+                    std::cout << "байт " << i << ": " << bytes[i]
+                              << " -> x1=" << x1 << " -> x2=" << x2
+                              << " -> x3=" << x3 << "\n";
+                }
+            }
+            if (bytes.size() > 5) {
+                std::cout << "... остальные байты обработаны так же\n";
             }
 
             write_numbers("encrypted.txt", enc);
