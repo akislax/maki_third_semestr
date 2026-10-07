@@ -1,13 +1,4 @@
-#include <iostream>
-#include <string>
-using namespace std;
-
-struct Array
-{
-    string* data = nullptr;
-    int size = 0;
-    int capacity = 0;
-};
+#include "array.h"
 
 void initArray(Array* arr)
 {
@@ -136,18 +127,4 @@ void freeArray(Array* arr)
     arr -> data = nullptr;
     arr -> size = 0;
     arr -> capacity = 0;
-}
-int main()
-{
-    Array arr;
-    initArray(&arr);
-    insertAt(&arr, "a", 0);
-    insertAt(&arr, "b", 1);
-    insertAt(&arr, "c", 2);
-    printArray(&arr);
-    insertAt(&arr, "X", 1);
-printArray(&arr);    // a X b c (size=4, capacity=4)
-insertAt(&arr, "Y", 1);
-printArray(&arr);    // a X b c (size=4, capacity=4)
-    return 0;
 }

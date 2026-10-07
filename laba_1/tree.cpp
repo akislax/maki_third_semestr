@@ -1,13 +1,4 @@
-#include <iostream>
-#include <vector>
-using namespace std;
-
-struct tree 
-{
-  int key;
-  tree* right;
-  tree* left;
-};
+#include "tree.h"
 
 tree* insert(tree* root, int key)
 {
@@ -131,11 +122,4 @@ tree* search(tree* root, int key)
         }
     }
     return nullptr;
-}
-
-int main()
-{
-  tree* root = nullptr;
-  
-  return 0;
 }

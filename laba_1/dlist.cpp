@@ -1,18 +1,4 @@
-#include <iostream>
-#include <string>
-
-struct DNode
-{
-    std::string person;
-    DNode* next;
-    DNode* prev;
-};
-
-struct Dlist
-{
-    DNode* head = nullptr;
-    DNode* tail = nullptr;
-};
+#include "dlist.h"
 
 bool isEmptyList(Dlist* dlist)
 {
@@ -228,36 +214,4 @@ void popName(Dlist* dlist, const std::string& name)
         popAfter(node -> prev, dlist);
     }
     
-}
-
-int main()
-{
-    Dlist list;
-
-    // добавляем с обоих концов
-    pushBack(&list, "Krosh");     //            Krosh
-    pushBack(&list, "Ejik");      //            Krosh, Ejik
-    pushFront(&list, "Nusha");    //     Nusha, Krosh, Ejik
-    pushFront(&list, "Losyash");  // Losyash, Nusha, Krosh, Ejik
-
-    std::cout << "Вперёд: "; printForward(&list);
-    std::cout << "Назад:  "; printBackward(&list);
-
-    popFront(&list);              // ушёл Losyash
-    std::cout << "После popFront: "; printForward(&list);
-
-    popBack(&list);               // ушёл Ejik
-    std::cout << "После popBack:  "; printForward(&list);
-     
-    pushBeetwen(list.head, &list, "X");
-    std::cout << "После вставки: "; printForward(&list);
-    std::cout << "Назад:         "; printBackward(&list);
-
-    pushBeetwen(list.tail, &list, "Z");
-    std::cout << "После хвоста:  "; printForward(&list);
-    std::cout << "Назад:         "; printBackward(&list); 
-
-    freeList(&list);
-    std::cout << "После freeList: "; printForward(&list);
-    return 0;
 }
