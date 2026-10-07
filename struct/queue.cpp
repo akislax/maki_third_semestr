@@ -1,99 +1,99 @@
 #include <iostream>
-#include <string>
 
+using namespace std;
 
-struct Node
+struct Node 
 {
-    std::string person;
-    Node* next;
+  int a;
+  Node* next;
 };
 
-struct Queue
+struct Q 
 {
-    Node* head;
-    Node* tail;  
+  Node* head = nullptr;
+  Node* tail = nullptr;
 };
 
-void initQueue(Queue* queue)
+bool isEmptyQ(Q* q)
 {
-    queue -> head = nullptr;
-    queue -> tail = nullptr;
-}
-bool isEmptyQueue(Queue* queue)
-{
-    if (queue -> head == nullptr) return true;
-    else return false;
-}
-void enqueue(Queue* queue, const std::string& name)
-{
-    Node* new_node = new Node{name, nullptr};   // новый встаёт последним, за ним никого
-
-    if (isEmptyQueue(queue))
-    {
-        queue->head = new_node;
-        queue->tail = new_node;
-    }
-    else
-    {
-        queue->tail->next = new_node;
-        queue->tail = new_node;
-    }
-}
-void dequeue(Queue* queue)
-{
-    if (isEmptyQueue(queue)) return;     // удалять нечего
-
-    Node* tmp = queue->head;             // запомнили первого
-    queue->head = tmp->next;             // первым стал следующий
-    delete tmp;                          // удалили
-
-    if (queue->head == nullptr)          // очередь опустела?
-    {
-        queue->tail = nullptr;           // тогда и хвост обнуляем
-    }
+  if (q -> head == nullptr) return true;
+  else return false;
 }
 
-void freeQueue(Queue* queue)
+void push(Q* q, int a)
 {
-    while (!isEmptyQueue(queue))
+  Node* new_node = new Node {a, nullptr};
+
+  if (isEmptyQ(q))
+  {
+    q -> head = new_node;
+    q -> tail = new_node;
+  }
+  else
+  {
+    q -> tail -> next = new_node;
+    q -> tail = new_node;
+  }
+}
+
+void pop(Q* q)
+{
+  if (isEmptyQ(q)) return;
+
+  Node* tmp = q -> head;
+  q -> head = q -> head -> next;
+  delete tmp;
+
+  if (isEmptyQ(q))
+  {
+    q -> tail = nullptr;
+  }
+}
+
+int top(Q* q)
+{
+  if (isEmptyQ(q)) return -1;
+  else
+  {
+    return q -> head -> a;
+  }
+}
+
+void freeQ(Q* q)
+{
+  while(!isEmptyQ(q))
     {
-        dequeue(queue);
+      pop(q);
     }
 }
 
-void print(Queue* queue)
+void printQ(Q* q)
 {
-    std::cout << "  head = " << queue->head << ", tail = " << queue->tail << std::endl;
-    std::cout << "  ";
-    Node* current = queue->head;
-    while (current != nullptr)
-    {
-        std::cout << current->person << " (" << current << ") -> ";
-        current = current->next;
-    }
-    std::cout << "nullptr" << std::endl;
+  Node* current = q -> head;
+  while (current != nullptr)
+  {
+  cout << current -> a << " (" << current << ") ->";
+  current = current -> next;
+  }
+  cout << "\n";
+  
 }
 
 int main()
 {
-    Queue queue;
-    initQueue(&queue);
-    std::cout << "Пустая:" << std::endl;
-    print(&queue);
-
-    enqueue(&queue, "Nusha");
-    enqueue(&queue, "Krosh");
-    enqueue(&queue, "Ejik");
-    std::cout << "После трёх enqueue:" << std::endl;
-    print(&queue);
-
-    dequeue(&queue);
-    std::cout << "После dequeue:" << std::endl;
-    print(&queue);
-
-    freeQueue(&queue);
-    std::cout << "После freeQueue:" << std::endl;
-    print(&queue);
-
-    return 0;
+  Q q;
+  push(&q, 1);
+  printQ(&q);
+  push(&q, 2);
+  printQ(&q);
+  push(&q, 3);
+  printQ(&q);
+  push(&q, 4);
+  printQ(&q);
+  pop(&q);
+  printQ(&q);
+  cout << top(&q) << "\n";
+  freeQ(&q);
+  printQ(&q);
+  return 0;
 }

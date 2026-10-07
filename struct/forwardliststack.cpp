@@ -1,75 +1,79 @@
 #include <iostream>
-#include <string>
+
+using namespace std;
 
 struct Node
 {
-    std::string name;
-    Node* next;
+  int a;
+  Node* next;
 };
 
 struct Stack
 {
-    Node* head;
+  Node* head = nullptr;
 };
 
-void InitStack(Stack* stack) //кладет в переменную stack адрес
-{
-    stack -> head = nullptr;
-}
 bool isEmptyStack(Stack* stack)
 {
-    if (stack -> head == nullptr) return true;
-    else return false;
+  return stack -> head == nullptr;
 }
 
-void push(Stack* stack, const std::string& name)
+void push(Stack* stack, int a)
 {
-    Node* new_node = new Node{name, stack -> head};
-    stack -> head = new_node;
+  Node* new_node = new Node{a, stack -> head};
+  stack -> head = new_node;
 }
 
 void pop(Stack* stack)
 {
-    if (stack -> head == nullptr) return;
-    Node* tmp = stack -> head;
-    stack -> head = stack -> head -> next;
-    delete tmp;
-
+  if (isEmptyStack(stack)) return;
+  Node* tmp = stack -> head;
+  stack -> head = stack -> head -> next;
+  delete tmp;
 }
+
+int top(Stack* stack)
+{
+  if (isEmptyStack(stack)) return -1;
+  return stack -> head -> a;
+}
+
 void freeStack(Stack* stack)
 {
-    while (!isEmptyStack(stack))
-    {
-        pop(stack);
-    }
+  while (!isEmptyStack(stack))
+  {
+    pop(stack);
+  }
 }
+
 void print(Stack* stack)
 {
-    Node* current = stack->head;
-    while (current != nullptr)
-    {
-        std::cout << current->name << " (" << current << ") -> ";
-        current = current->next;
-    }
-    std::cout << "nullptr" << std::endl;
+  Node* current = stack -> head;
+  while (current != nullptr)
+  {
+    cout << current -> a << " (" << current << ") -> ";
+    current = current -> next;
+  }
+  cout << "nullptr\n";
 }
 
 int main()
 {
-    Stack stack;                  // коробка в main
-    InitStack(&stack);            // head = nullptr, стек пустой
-    std::cout << "Пустой:       "; print(&stack);
+  Stack stack;
+  cout << "Пустой:     "; print(&stack);
 
-    push(&stack, "Sovunya");      // new: Sovunya в куче
-    push(&stack, "Losyash");      // new: Losyash в куче
-    push(&stack, "Krosh");        // new: Krosh в куче
-    std::cout << "После push:   "; print(&stack);
+  push(&stack, 1);
+  push(&stack, 2);
+  push(&stack, 3);
+  cout << "push 1 2 3: "; print(&stack);
 
-    pop(&stack);                  // delete: снимаем верхний
-    std::cout << "После pop:    "; print(&stack);
+  cout << "top: " << top(&stack) << "\n";
 
-    freeStack(&stack);            // delete всех оставшихся
-    std::cout << "После free:   "; print(&stack);
+  pop(&stack);
+  cout << "pop:        "; print(&stack);
 
-    return 0;
+  freeStack(&stack);
+  cout << "free:       "; print(&stack);
+
+  return 0;
 }

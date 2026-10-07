@@ -10,15 +10,9 @@ struct DNode
 
 struct Dlist
 {
-    DNode* head;
-    DNode* tail;
+    DNode* head = nullptr;
+    DNode* tail = nullptr;
 };
-
-void init2hand(Dlist* dlist)
-{
-    dlist -> head = nullptr;
-    dlist -> tail = nullptr;
-}
 
 bool isEmptyList(Dlist* dlist)
 {
@@ -58,28 +52,6 @@ void popBack(Dlist* dlist)
         dlist->tail->next = nullptr; // за новым хвостом никого
     }
     delete tmp;
-}
-
-void printForward(Dlist* dlist)
-{
-    DNode* current = dlist->head;
-    while (current != nullptr)
-    {
-        std::cout << current->person << " <-> ";
-        current = current->next;     // шаг к концу
-    }
-    std::cout << "nullptr" << std::endl;
-}
-
-void printBackward(Dlist* dlist)
-{
-    DNode* current = dlist -> tail;
-    while (current != nullptr)
-    {
-        std::cout << current -> person << " <-> ";
-        current = current -> prev;
-    }
-    std::cout << "nullptr" << std::endl;
 }
 
 void freeList(Dlist* dlist)
@@ -126,10 +98,141 @@ void popFront(Dlist* dlist)
     delete tmp;
 }
 
+void pushBeetwen (DNode* list, Dlist* dlist, const std::string& name)
+{
+    if (list == nullptr) return;
+    DNode* new_node = new DNode {name, nullptr, nullptr};
+
+    new_node -> next = list -> next;
+
+    new_node -> prev = list;
+
+    if (list -> next != nullptr)
+    {
+    list -> next -> prev = new_node;
+    }
+    else 
+    {
+        dlist -> tail = new_node;
+    }
+    list -> next = new_node;
+}
+
+void pushBefore(DNode* list, Dlist* dlist, const std::string& name)
+{
+    if (list == nullptr) return;
+    
+    if (list -> prev == nullptr)
+    {
+        pushFront(dlist, name);
+    }
+    else
+    {
+        pushBeetwen(list -> prev, dlist, name);
+    }
+}
+
+void popAfter(DNode* list, Dlist* dlist)
+{
+    if (list == nullptr || list -> next == nullptr) return;
+    
+    DNode* tmp = list -> next;
+
+    if (tmp -> next == nullptr)
+    {
+        list -> next = nullptr;
+        dlist -> tail = list;
+        delete tmp;
+        return;
+    }
+    
+    list -> next = tmp -> next;
+
+    tmp -> next -> prev = list;
+
+    delete tmp;
+
+}
+
+void popBefore(DNode* list, Dlist* dlist)
+{
+    if (list == nullptr || list -> prev == nullptr) return;
+
+    DNode* tmp = list -> prev;
+
+    if (tmp -> prev == nullptr)
+    {
+        list -> prev = nullptr;
+        dlist -> head = list;
+        delete tmp;
+        return;
+    }
+
+    tmp -> prev -> next = list;
+    list -> prev = tmp -> prev;
+
+    delete tmp;
+}
+
+void printForward(Dlist* dlist)
+{
+    DNode* current = dlist->head;
+    while (current != nullptr)
+    {
+        std::cout << current->person << " <-> ";
+        current = current->next;     // шаг к концу
+    }
+    std::cout << "nullptr" << std::endl;
+}
+
+void printBackward(Dlist* dlist)
+{
+    DNode* current = dlist -> tail;
+    while (current != nullptr)
+    {
+        std::cout << current -> person << " <-> ";
+        current = current -> prev;
+    }
+    std::cout << "nullptr" << std::endl;
+}
+
+DNode* findName(Dlist* dlist, const std::string& name)
+{
+    DNode* current = dlist -> head;
+
+    while (current != nullptr)
+    {
+        if (current -> person == name)
+        {
+            return current;
+        }
+        current = current -> next;
+    }
+    return nullptr;
+}
+
+void popName(Dlist* dlist, const std::string& name)
+{
+    DNode* node = findName(dlist, name);
+    if (node == nullptr) 
+    {
+        std::cout << "нет такого элемента\n";
+        return;
+    }
+    if (node == dlist -> head)
+    {
+        popFront(dlist);
+    }
+    else
+    {
+        popAfter(node -> prev, dlist);
+    }
+    
+}
+
 int main()
 {
     Dlist list;
-    init2hand(&list);
 
     // добавляем с обоих концов
     pushBack(&list, "Krosh");     //            Krosh
@@ -145,6 +248,14 @@ int main()
 
     popBack(&list);               // ушёл Ejik
     std::cout << "После popBack:  "; printForward(&list);
+     
+    pushBeetwen(list.head, &list, "X");
+    std::cout << "После вставки: "; printForward(&list);
+    std::cout << "Назад:         "; printBackward(&list);
+
+    pushBeetwen(list.tail, &list, "Z");
+    std::cout << "После хвоста:  "; printForward(&list);
+    std::cout << "Назад:         "; printBackward(&list); 
 
     freeList(&list);
     std::cout << "После freeList: "; printForward(&list);

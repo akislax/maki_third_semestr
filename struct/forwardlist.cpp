@@ -1,82 +1,193 @@
 #include <iostream>
-#include <string>
+using namespace std;
 
 struct Node
 {
-    std::string person;
-    Node* next;
+  int number;
+  Node* next;
 };
 
-void freeList(Node* head)
+Node* pushFront(Node* head, int a)
 {
-    while (head != nullptr)
-    {
-        Node* tmp = head;
-        head = head -> next;
-        delete tmp;
-    }
-}
-
-Node* pushFront (Node* head, const std::string& name)
-{
-    Node* new_node = new Node {name, head};
+    Node* new_node = new Node{a, head};
     return new_node;
-}
-
-void addOne(Node* first, const std::string& name)
-{
-    Node* new_node = new Node{name, first -> next};
-    first -> next = new_node;
 }
 
 Node* popFront(Node* head)
 {
-    if (head == nullptr) return nullptr;  // список пуст, удалять нечего
+  if (head == nullptr) return nullptr;
+  Node* tmp = head;
+  head = head -> next;
+  delete tmp;
+  return head;
+}
+
+void addOne(Node* first, int a)
+{
+  Node* new_node = new Node{a, first -> next};
+  first -> next = new_node;
+}
+
+void deleteNode(Node* abc)
+{
+  if (abc -> next == nullptr) return;
+  Node* tmp = abc -> next;
+  abc -> next = tmp -> next;
+  delete tmp;
+
+}
+
+void freeList(Node* head)
+{
+  while (head != nullptr)
+  {
     Node* tmp = head;
-    head = head->next;
+    head = head -> next;
     delete tmp;
-    return head;                          // возвращаем новую голову
+  }
+  
 }
 
-void DeleteNode(Node* first)
+Node* addTail(Node* head, int number)
 {
-    if (first -> next == nullptr) return;
-
-    Node* tmp = first -> next;
-    first -> next = tmp -> next;
-    delete tmp;
-}
-void print(Node* head)
-{
-    while (head != nullptr)
+  Node* new_node = new Node{number, nullptr};
+  
+   if (head == nullptr)         
     {
-        std::cout << head->person << " (" << head << ") -> ";
-        head = head->next;
+      return new_node;
     }
-    std::cout << "nullptr" << std::endl;
+
+  Node* tmp = head;
+  while (tmp -> next != nullptr)
+  {
+
+      tmp = tmp -> next;
+  }
+  tmp -> next = new_node;
+  return head;
+  
+}
+
+Node* popTail(Node* head)
+{
+    if (head == nullptr) return nullptr;
+
+    if (head -> next == nullptr)
+    {
+        delete head;
+        return nullptr;
+    }
+
+    Node* tmp = head;
+    while (tmp -> next -> next != nullptr)
+    {
+        tmp = tmp -> next;
+    }
+
+    delete tmp -> next;
+    tmp -> next = nullptr;
+    return head;
+}
+
+Node* addBefore(Node* head, Node* target, int a)
+{
+    if (target == head) return pushFront(head, a);
+
+    Node* p = head;
+    while (p -> next != target)
+    {
+        p = p -> next;
+    }
+    addOne(p, a);
+    return head;
+}
+
+Node* deleteBefore(Node* head, Node* target)
+{
+    if (head == nullptr || target == head) return head;
+
+    if (head -> next == target) return popFront(head);
+
+    Node* p = head;
+    while (p -> next -> next != target)
+    {
+        p = p -> next;
+    }
+    deleteNode(p);
+    return head;
+}
+
+Node* findValue(Node* head, int a)
+{
+    Node* current = head;
+    while (current != nullptr)
+    {
+        if (current -> number == a) return current;
+        current = current -> next;
+    }
+    return nullptr;
+}
+
+Node* deleteValue(Node* head, int a)
+{
+    if (head == nullptr) return head;
+
+    if (head -> number == a) return popFront(head);
+
+    Node* p = head;
+    while (p -> next != nullptr && p -> next -> number != a)
+    {
+        p = p -> next;
+    }
+
+    if (p -> next != nullptr) deleteNode(p);
+    return head;
+}
+
+void printReverse(Node* head)
+{
+    if (head == nullptr) return;
+    printReverse(head -> next);
+    cout << head -> number << " ";
+}
+
+void printList(Node* head)
+{
+    for (Node* p = head; p != nullptr; p = p -> next)
+    {
+        cout << p -> number << " -> ";
+    }
+    cout << "nullptr\n";
 }
 
 int main()
 {
-    Node* head = new Node{"Nusha", nullptr};
-    head->next = new Node{"Krosh", nullptr};
-    head->next->next = new Node{"Ejik", nullptr};
-    std::cout << "Начало:            "; print(head);
+  Node* head = new Node{1, nullptr};
+  head -> next = new Node{2, nullptr};
+  head -> next -> next = new Node{3, nullptr};
+  head -> next -> next -> next = new Node{4, nullptr};
+  cout << "Создали:       ";
+  printList(head);
 
-    head = pushFront(head, "Losyash");
-    std::cout << "pushFront Losyash: "; print(head);
+  head = pushFront(head, 0);
+  cout << "pushFront(0):  ";
+  printList(head);
 
-    head = popFront(head);
-    std::cout << "popFront:          "; print(head);
+  head = popFront(head);
+  cout << "popFront:      ";
+  printList(head);
 
-    addOne(head, "Sovunya");            // после Nusha
-    std::cout << "addOne Sovunya:    "; print(head);
+  addOne(head, 67);
+  cout << "addOne(67):    ";
+  printList(head);
 
-    DeleteNode(head);                   // удалит того, кто после Nusha (Sovunya)
-    std::cout << "DeleteNode:        "; print(head);
+  deleteNode(head);
+  cout << "deleteNode:    ";
+  printList(head);
 
-    freeList(head);
-    head = nullptr;
-    std::cout << "После freeList:    "; print(head);
-    return 0;
+  freeList(head);
+  cout << "freeList:      ";
+  printList(head);
+
+  return 0;
 }
