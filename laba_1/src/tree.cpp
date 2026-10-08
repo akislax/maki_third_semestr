@@ -63,7 +63,7 @@ void bfs(tree* root)
 
   vector<tree*> ochered;
   ochered.push_back(root);
-  for (int i = 0; i < ochered.size(); i++)
+  for (size_t i = 0; i < ochered.size(); i++)
   {
     tree* node = ochered[i];
     cout << node -> key << " ";
@@ -88,7 +88,7 @@ bool isComplete(tree* root)
     ochered.push_back(root);
     bool sawEmpty = false;
 
-    for (int i = 0; i < ochered.size(); i++)
+    for (size_t i = 0; i < ochered.size(); i++)
     {
         tree* node = ochered[i];
 
