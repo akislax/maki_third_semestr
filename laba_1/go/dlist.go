@@ -140,15 +140,3 @@ func dlistPrintBackward(list *DList) {
 	}
 	fmt.Println("nil")
 }
-
-func dlistToString(list *DList) string {
-	result := ""
-	for current := list.head; current != nil; current = current.next {
-		if result == "" {
-			result = current.value
-		} else {
-			result = result + " " + current.value
-		}
-	}
-	return result
-}

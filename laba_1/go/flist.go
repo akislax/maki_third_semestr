@@ -131,15 +131,3 @@ func flistPrintReverse(node *FNode) {
 	flistPrintReverse(node.next)
 	fmt.Print(node.value, " ")
 }
-
-func flistToString(list *FList) string {
-	result := ""
-	for current := list.head; current != nil; current = current.next {
-		if result == "" {
-			result = current.value
-		} else {
-			result = result + " " + current.value
-		}
-	}
-	return result
-}

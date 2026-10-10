@@ -50,15 +50,3 @@ func queuePrint(q *Queue) {
 	}
 	fmt.Println("nil")
 }
-
-func queueToString(q *Queue) string {
-	result := ""
-	for current := q.head; current != nil; current = current.next {
-		if result == "" {
-			result = current.value
-		} else {
-			result = result + " " + current.value
-		}
-	}
-	return result
-}

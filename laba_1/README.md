@@ -17,22 +17,20 @@ laba_1/
 
 ```
 make
-./dbms --file data.txt --query "SPUSH 5"
+./dbms --file data.json --query "SPUSH 5"
 ```
 
 Команду писать в кавычках.
 
 ## Сборка и запуск (Go)
 
-Нужен установленный Go (`sudo pacman -S go`).
-
 ```
 cd go
 go build -o dbms_go
-./dbms_go --file ../data.txt --query "SPUSH 5"
+./dbms_go --file data.json --query "SPUSH 5"
 ```
 
-Обе версии используют один формат файла, поэтому можно запускать их на одном и том же data.txt. Go-версия строку с деревом не трогает. Освобождать память в Go не нужно, это делает сборщик мусора.
+Обе версии используют один формат файла, поэтому можно запускать их на одном и том же data.json. Go-версия строку с деревом не трогает. Освобождать память в Go не нужно, это делает сборщик мусора.
 
 ## Команды
 
@@ -95,14 +93,14 @@ PRINT S           вместо S можно M, F, L, Q, T
 ## Пример
 
 ```
-$ ./dbms --file data.txt --query "SPUSH 5"
+$ ./dbms --file data.json --query "SPUSH 5"
 -> 5
-$ ./dbms --file data.txt --query "SPOP"
+$ ./dbms --file data.json --query "SPOP"
 -> 5
-$ ./dbms --file data.txt --query "QPOP"
+$ ./dbms --file data.json --query "QPOP"
 -> q
-$ ./dbms --file data.txt --query "TINSERT 1"
+$ ./dbms --file data.json --query "TINSERT 1"
 -> 1
-$ ./dbms --file data.txt --query "TCOMPLETE"
+$ ./dbms --file data.json --query "TCOMPLETE"
 -> TRUE
 ```

@@ -84,15 +84,3 @@ func arrayPrint(arr *Array) {
 	}
 	fmt.Printf("(size=%d, capacity=%d)\n", arr.size, arr.capacity)
 }
-
-func arrayToString(arr *Array) string {
-	result := ""
-	for i := 0; i < arr.size; i++ {
-		if result == "" {
-			result = arr.data[i]
-		} else {
-			result = result + " " + arr.data[i]
-		}
-	}
-	return result
-}
