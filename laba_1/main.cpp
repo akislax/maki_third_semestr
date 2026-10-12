@@ -1,5 +1,5 @@
 #include "commands.h"
-#include "hand.h"
+#include "function.h"
 #include <iostream>
 #include <fstream>
 

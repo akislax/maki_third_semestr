@@ -1,8 +1,22 @@
 {
-    "MYFLIST1": {
+    "mytree": {
         "data": [
-            "3"
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
         ],
-        "type": "flist"
+        "type": "tree"
+    },
+    "mytwo": {
+        "data": [
+            "blue",
+            "pink",
+            "green",
+            "Ferari"
+        ],
+        "type": "dlist"
     }
 }
