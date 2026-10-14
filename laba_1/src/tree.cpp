@@ -5,25 +5,27 @@ tree* insert(tree* root, int key)
     tree* new_node = new tree{key, nullptr, nullptr};
     if (root == nullptr) return new_node;
 
-    vector<tree*> ochered;
-    ochered.push_back(root);
-    for (size_t i = 0; i < ochered.size(); i++)
+    tree* parent = nullptr;
+    tree* current = root;
+    while (current != nullptr)
     {
-        tree* node = ochered[i];
-
-        if (node -> left == nullptr)
+        parent = current;
+        if (key < current -> key)
         {
-            node -> left = new_node;
-            return root;
+            current = current -> left;
         }
-        ochered.push_back(node -> left);
-
-        if (node -> right == nullptr)
+        else
         {
-            node -> right = new_node;
-            return root;
+            current = current -> right;
         }
-        ochered.push_back(node -> right);
+    }
+    if (key < parent -> key)
+    {
+        parent -> left = new_node;
+    }
+    else
+    {
+        parent -> right = new_node;
     }
     return root;
 }
@@ -103,16 +105,18 @@ bool isComplete(tree* root)
 
 tree* search(tree* root, int key)
 {
-    if (root == nullptr) return nullptr;
-
-    vector<tree*> ochered;
-    ochered.push_back(root);
-    for (size_t i = 0; i < ochered.size(); i++)
+    tree* current = root;
+    while (current != nullptr)
     {
-        tree* node = ochered[i];
-        if (node -> key == key) return node;
-        if (node -> left != nullptr) ochered.push_back(node -> left);
-        if (node -> right != nullptr) ochered.push_back(node -> right);
+        if (key == current -> key) return current;
+        if (key < current -> key)
+        {
+            current = current -> left;
+        }
+        else
+        {
+            current = current -> right;
+        }
     }
     return nullptr;
 }
