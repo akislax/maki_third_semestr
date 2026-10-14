@@ -27,7 +27,7 @@ make
 ```
 cd go
 go build -o dbms_go
-./dbms_go --file data.json --query "SPUSH 5"
+./dbms_go --file data.json --query "SPUSH mystack 5"
 ```
 
 Обе версии используют один формат файла, поэтому можно запускать их на одном и том же data.json. Go-версия строку с деревом не трогает. Освобождать память в Go не нужно, это делает сборщик мусора.
@@ -93,14 +93,14 @@ PRINT S           вместо S можно M, F, L, Q, T
 ## Пример
 
 ```
-$ ./dbms --file data.json --query "SPUSH 5"
+$ ./dbms --file data.json --query "SPUSH mystack 5"
 -> 5
-$ ./dbms --file data.json --query "SPOP"
+$ ./dbms --file data.json --query "SPOP mystack"
 -> 5
-$ ./dbms --file data.json --query "QPOP"
--> q
-$ ./dbms --file data.json --query "TINSERT 1"
+$ ./dbms --file data.json --query "QPOP myquery"
+-> 2
+$ ./dbms --file data.json --query "TINSERT mytree 1"
 -> 1
-$ ./dbms --file data.json --query "TCOMPLETE"
+$ ./dbms --file data.json --query "TCOMPLETE mytree"
 -> TRUE
 ```
