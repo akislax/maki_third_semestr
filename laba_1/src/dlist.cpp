@@ -215,3 +215,88 @@ void popName(Dlist* dlist, const std::string& name)
     }
     
 }
+
+void handleDlist(Command command, json& db, const string& name, stringstream& ss)
+{
+    if (wrongType(db, name, "dlist")) return;
+
+    Dlist dl;
+    if (db.contains(name))
+    {
+        for (auto& element : db[name]["data"])
+        {
+            pushBack(&dl, element.get<string>());
+        }
+    }
+
+    string target, value;
+    DNode* node = nullptr;
+    switch (command)
+    {
+        case Command::LPUSHH:
+            ss >> value;
+            pushFront(&dl, value);
+            break;
+        case Command::LPUSHT:
+            ss >> value;
+            pushBack(&dl, value);
+            break;
+        case Command::LPUSHA:
+            ss >> target >> value;
+            node = findName(&dl, target);
+            if (node == nullptr) cout << "нет такого элемента\n";
+            else pushBeetwen(node, &dl, value);
+            break;
+        case Command::LPUSHB:
+            ss >> target >> value;
+            node = findName(&dl, target);
+            if (node == nullptr) cout << "нет такого элемента\n";
+            else pushBefore(node, &dl, value);
+            break;
+        case Command::LDELH:
+            popFront(&dl);
+            break;
+        case Command::LDELT:
+            popBack(&dl);
+            break;
+        case Command::LDELA:
+            ss >> target;
+            node = findName(&dl, target);
+            if (node == nullptr) cout << "нет такого элемента\n";
+            else popAfter(node, &dl);
+            break;
+        case Command::LDELB:
+            ss >> target;
+            node = findName(&dl, target);
+            if (node == nullptr) cout << "нет такого элемента\n";
+            else popBefore(node, &dl);
+            break;
+        case Command::LDEL:
+            ss >> value;
+            popName(&dl, value);
+            break;
+        case Command::LFIND:
+            ss >> value;
+            if (findName(&dl, value) != nullptr) cout << "-> TRUE\n";
+            else cout << "-> FALSE\n";
+            break;
+        case Command::LPRINT:
+            printForward(&dl);
+            break;
+        case Command::LPRINTR:
+            printBackward(&dl);
+            break;
+        default:
+            break;
+    }
+
+    json data = json::array();
+    for (DNode* current = dl.head; current != nullptr; current = current -> next)
+    {
+        data.push_back(current -> person);
+    }
+    db[name]["type"] = "dlist";
+    db[name]["data"] = data;
+
+    freeList(&dl);
+}

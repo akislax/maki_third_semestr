@@ -43,3 +43,50 @@ void print(Stack* stack)
   }
   cout << "nullptr\n";
 }
+
+void handleStack(Command command, json& db, const string& name, stringstream& ss)
+{
+    if (wrongType(db, name, "stack")) return;
+
+    Stack stack;
+    if (db.contains(name))
+    {
+        for (auto& element : db[name]["data"])
+        {
+            push(&stack, element.get<string>());
+        }
+    }
+
+    string value;
+    switch (command)
+    {
+        case Command::SPUSH:
+            ss >> value;
+            push(&stack, value);
+            cout << "-> " << value << "\n";
+            break;
+        case Command::SPOP:
+            if (isEmptyStack(&stack)) cout << "-> стек пуст\n";
+            else
+            {
+                cout << "-> " << top(&stack) << "\n";
+                pop(&stack);
+            }
+            break;
+        case Command::SPRINT:
+            print(&stack);
+            break;
+        default:
+            break;
+    }
+
+    json data = json::array();
+    for (SNode* current = stack.head; current != nullptr; current = current -> next)
+    {
+        data.insert(data.begin(), current -> a);
+    }
+    db[name]["type"] = "stack";
+    db[name]["data"] = data;
+
+    freeStack(&stack);
+}

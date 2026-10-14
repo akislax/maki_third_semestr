@@ -1,4 +1,5 @@
 #pragma once
+#include "commands.h"
 #include <iostream>
 #include <string>
 using namespace std;
@@ -22,3 +23,5 @@ FNode* findValue(FNode* head, const string& a);
 FNode* deleteValue(FNode* head, const string& a);
 void printReverse(FNode* head);
 void printList(FNode* head);
+
+void handleFlist(Command command, json& db, const string& name, stringstream& ss);

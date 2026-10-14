@@ -52,3 +52,13 @@ Command toCommand(const string& text)
     if (text == "PRINT") return Command::PRINT;
     return Command::UNKNOWN;
 }
+
+bool wrongType(json& db, const string& name, const string& type)
+{
+    if (db.contains(name) && db[name]["type"] != type.c_str())
+    {
+        cout << name << " это не " << type << "\n";
+        return true;
+    }
+    return false;
+}

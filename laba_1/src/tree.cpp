@@ -2,35 +2,30 @@
 
 tree* insert(tree* root, int key)
 {
-  tree* new_node = new tree{key, nullptr, nullptr};
-  
-  if (root == nullptr)
-  {
-    return new_node;
-  }
-  tree* parent = nullptr;
-  tree* current = root;
-  while (current != nullptr)
-  {
-    parent = current;
-    if (key < current -> key)
+    tree* new_node = new tree{key, nullptr, nullptr};
+    if (root == nullptr) return new_node;
+
+    vector<tree*> ochered;
+    ochered.push_back(root);
+    for (size_t i = 0; i < ochered.size(); i++)
     {
-      current = current -> left;
+        tree* node = ochered[i];
+
+        if (node -> left == nullptr)
+        {
+            node -> left = new_node;
+            return root;
+        }
+        ochered.push_back(node -> left);
+
+        if (node -> right == nullptr)
+        {
+            node -> right = new_node;
+            return root;
+        }
+        ochered.push_back(node -> right);
     }
-    else
-    {
-      current = current -> right;
-    }
-  }
-  if (key < parent -> key)
-  {
-    parent -> left = new_node;
-  }
-  else
-  {
-    parent -> right = new_node;
-  }
-  return root;
+    return root;
 }
 
 void preorder(tree* node)
@@ -108,18 +103,72 @@ bool isComplete(tree* root)
 
 tree* search(tree* root, int key)
 {
-    tree* current = root;
-    while (current != nullptr)
+    if (root == nullptr) return nullptr;
+
+    vector<tree*> ochered;
+    ochered.push_back(root);
+    for (size_t i = 0; i < ochered.size(); i++)
     {
-        if (key == current -> key) return current;
-        if (key < current -> key)
-        {
-            current = current -> left;
-        }
-        else
-        {
-            current = current -> right;
-        }
+        tree* node = ochered[i];
+        if (node -> key == key) return node;
+        if (node -> left != nullptr) ochered.push_back(node -> left);
+        if (node -> right != nullptr) ochered.push_back(node -> right);
     }
     return nullptr;
+}
+
+void handleTree(Command command, json& db, const string& name, stringstream& ss)
+{
+    if (wrongType(db, name, "tree")) return;
+
+    tree* root = nullptr;
+    if (db.contains(name))
+    {
+        for (auto& element : db[name]["data"])
+        {
+            root = insert(root, element.get<int>());
+        }
+    }
+
+    int value;
+    switch (command)
+    {
+        case Command::TINSERT:
+            ss >> value;
+            root = insert(root, value);
+            cout << "-> " << value << "\n";
+            break;
+        case Command::TFIND:
+            ss >> value;
+            if (search(root, value) != nullptr) cout << "-> TRUE\n";
+            else cout << "-> FALSE\n";
+            break;
+        case Command::TCOMPLETE:
+            if (isComplete(root)) cout << "-> TRUE\n";
+            else cout << "-> FALSE\n";
+            break;
+        case Command::TPRINT:
+            cout << "прямой:       "; preorder(root);  cout << "\n";
+            cout << "симметричный: "; inorder(root);   cout << "\n";
+            cout << "обратный:     "; postorder(root); cout << "\n";
+            cout << "в ширину:     "; bfs(root);       cout << "\n";
+            break;
+        default:
+            break;
+    }
+
+    json data = json::array();
+    vector<tree*> ochered;
+    if (root != nullptr) ochered.push_back(root);
+    for (size_t i = 0; i < ochered.size(); i++)
+    {
+        tree* node = ochered[i];
+        data.push_back(node -> key);
+        if (node -> left != nullptr) ochered.push_back(node -> left);
+        if (node -> right != nullptr) ochered.push_back(node -> right);
+    }
+    db[name]["type"] = "tree";
+    db[name]["data"] = data;
+
+    freeTree(root);
 }

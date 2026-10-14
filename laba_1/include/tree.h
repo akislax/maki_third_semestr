@@ -1,4 +1,5 @@
 #pragma once
+#include "commands.h"
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -18,3 +19,5 @@ void bfs(tree* root);
 void freeTree(tree* node);
 bool isComplete(tree* root);
 tree* search(tree* root, int key);
+
+void handleTree(Command command, json& db, const string& name, stringstream& ss);

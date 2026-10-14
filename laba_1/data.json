@@ -9,14 +9,5 @@
             6
         ],
         "type": "tree"
-    },
-    "mytwo": {
-        "data": [
-            "blue",
-            "pink",
-            "green",
-            "Ferari"
-        ],
-        "type": "dlist"
     }
 }

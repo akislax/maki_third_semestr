@@ -1,6 +1,10 @@
 #pragma once
+#include <iostream>
 #include <string>
+#include <sstream>
+#include <nlohmann/json.hpp>
 using namespace std;
+using json = nlohmann::json;
 
 enum class Command
 {
@@ -15,3 +19,4 @@ enum class Command
 };
 
 Command toCommand(const string& text);
+bool wrongType(json& db, const string& name, const string& type);

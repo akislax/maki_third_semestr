@@ -1,4 +1,5 @@
 #pragma once
+#include "commands.h"
 #include <iostream>
 #include <string>
 using namespace std;
@@ -20,3 +21,5 @@ int lenghtArray(Array* arr);
 void insertAt(Array* arr, const string& text, int index);
 void removeAt(Array* arr, int index);
 void freeArray(Array* arr);
+
+void handleArray(Command command, json& db, const string& name, stringstream& ss);

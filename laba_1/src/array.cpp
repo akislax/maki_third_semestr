@@ -128,3 +128,63 @@ void freeArray(Array* arr)
     arr -> size = 0;
     arr -> capacity = 0;
 }
+
+void handleArray(Command command, json& db, const string& name, stringstream& ss)
+{
+    if (wrongType(db, name, "array")) return;
+
+    Array arr;
+    initArray(&arr);
+    if (db.contains(name))
+    {
+        for (auto& element : db[name]["data"])
+        {
+            pushBack(&arr, element.get<string>());
+        }
+    }
+
+    int index;
+    string value;
+    switch (command)
+    {
+        case Command::MPUSH:
+            ss >> value;
+            pushBack(&arr, value);
+            cout << "-> " << value << "\n";
+            break;
+        case Command::MINSERT:
+            ss >> index >> value;
+            insertAt(&arr, value, index);
+            break;
+        case Command::MGET:
+            ss >> index;
+            cout << "-> " << getAt(&arr, index) << "\n";
+            break;
+        case Command::MSET:
+            ss >> index >> value;
+            setAt(&arr, value, index);
+            break;
+        case Command::MDEL:
+            ss >> index;
+            removeAt(&arr, index);
+            break;
+        case Command::MLEN:
+            cout << "-> " << lenghtArray(&arr) << "\n";
+            break;
+        case Command::MPRINT:
+            printArray(&arr);
+            break;
+        default:
+            break;
+    }
+
+    json data = json::array();
+    for (int i = 0; i < arr.size; i++)
+    {
+        data.push_back(arr.data[i]);
+    }
+    db[name]["type"] = "array";
+    db[name]["data"] = data;
+
+    freeArray(&arr);
+}

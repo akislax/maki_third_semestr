@@ -1,7 +1,26 @@
-#include "commands.h"
-#include "function.h"
-#include <iostream>
+#include "array.h"
+#include "flist.h"
+#include "dlist.h"
+#include "stack.h"
+#include "queue.h"
+#include "tree.h"
 #include <fstream>
+
+void handlePrint(json& db, const string& name, stringstream& ss)
+{
+    if (!db.contains(name))
+    {
+        cout << "нет структуры " << name << "\n";
+        return;
+    }
+
+    if (db[name]["type"] == "array") handleArray(Command::MPRINT, db, name, ss);
+    else if (db[name]["type"] == "flist") handleFlist(Command::FPRINT, db, name, ss);
+    else if (db[name]["type"] == "dlist") handleDlist(Command::LPRINT, db, name, ss);
+    else if (db[name]["type"] == "stack") handleStack(Command::SPRINT, db, name, ss);
+    else if (db[name]["type"] == "queue") handleQueue(Command::QPRINT, db, name, ss);
+    else if (db[name]["type"] == "tree") handleTree(Command::TPRINT, db, name, ss);
+}
 
 int main(int argc, char* argv[])
 {

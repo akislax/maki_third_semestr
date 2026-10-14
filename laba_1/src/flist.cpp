@@ -152,3 +152,89 @@ void printList(FNode* head)
     }
     cout << "nullptr\n";
 }
+
+void handleFlist(Command command, json& db, const string& name, stringstream& ss)
+{
+    if (wrongType(db, name, "flist")) return;
+
+    FNode* head = nullptr;
+    if (db.contains(name))
+    {
+        for (auto& element : db[name]["data"])
+        {
+            head = addTail(head, element.get<string>());
+        }
+    }
+
+    string target, value;
+    FNode* node = nullptr;
+    switch (command)
+    {
+        case Command::FPUSHH:
+            ss >> value;
+            head = pushFront(head, value);
+            break;
+        case Command::FPUSHT:
+            ss >> value;
+            head = addTail(head, value);
+            break;
+        case Command::FPUSHA:
+            ss >> target >> value;
+            node = findValue(head, target);
+            if (node == nullptr) cout << "нет такого элемента\n";
+            else addOne(node, value);
+            break;
+        case Command::FPUSHB:
+            ss >> target >> value;
+            node = findValue(head, target);
+            if (node == nullptr) cout << "нет такого элемента\n";
+            else head = addBefore(head, node, value);
+            break;
+        case Command::FDELH:
+            head = popFront(head);
+            break;
+        case Command::FDELT:
+            head = popTail(head);
+            break;
+        case Command::FDELA:
+            ss >> target;
+            node = findValue(head, target);
+            if (node == nullptr) cout << "нет такого элемента\n";
+            else deleteNode(node);
+            break;
+        case Command::FDELB:
+            ss >> target;
+            node = findValue(head, target);
+            if (node == nullptr) cout << "нет такого элемента\n";
+            else head = deleteBefore(head, node);
+            break;
+        case Command::FDEL:
+            ss >> value;
+            head = deleteValue(head, value);
+            break;
+        case Command::FFIND:
+            ss >> value;
+            if (findValue(head, value) != nullptr) cout << "-> TRUE\n";
+            else cout << "-> FALSE\n";
+            break;
+        case Command::FPRINT:
+            printList(head);
+            break;
+        case Command::FPRINTR:
+            printReverse(head);
+            cout << "\n";
+            break;
+        default:
+            break;
+    }
+
+    json data = json::array();
+    for (FNode* current = head; current != nullptr; current = current -> next)
+    {
+        data.push_back(current -> value);
+    }
+    db[name]["type"] = "flist";
+    db[name]["data"] = data;
+
+    freeList(head);
+}

@@ -1,4 +1,5 @@
 #pragma once
+#include "commands.h"
 #include <iostream>
 #include <string>
 using namespace std;
@@ -21,3 +22,5 @@ void pop(Q* q);
 string top(Q* q);
 void freeQ(Q* q);
 void printQ(Q* q);
+
+void handleQueue(Command command, json& db, const string& name, stringstream& ss);

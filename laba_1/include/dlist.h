@@ -1,6 +1,8 @@
 #pragma once
+#include "commands.h"
 #include <iostream>
 #include <string>
+using namespace std;
 
 struct DNode
 {
@@ -29,3 +31,5 @@ void printForward(Dlist* dlist);
 void printBackward(Dlist* dlist);
 DNode* findName(Dlist* dlist, const std::string& name);
 void popName(Dlist* dlist, const std::string& name);
+
+void handleDlist(Command command, json& db, const string& name, stringstream& ss);

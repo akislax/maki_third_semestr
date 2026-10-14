@@ -64,3 +64,50 @@ void printQ(Q* q)
   cout << "nullptr\n";
   
 }
+
+void handleQueue(Command command, json& db, const string& name, stringstream& ss)
+{
+    if (wrongType(db, name, "queue")) return;
+
+    Q q;
+    if (db.contains(name))
+    {
+        for (auto& element : db[name]["data"])
+        {
+            push(&q, element.get<string>());
+        }
+    }
+
+    string value;
+    switch (command)
+    {
+        case Command::QPUSH:
+            ss >> value;
+            push(&q, value);
+            cout << "-> " << value << "\n";
+            break;
+        case Command::QPOP:
+            if (isEmptyQ(&q)) cout << "-> очередь пуста\n";
+            else
+            {
+                cout << "-> " << top(&q) << "\n";
+                pop(&q);
+            }
+            break;
+        case Command::QPRINT:
+            printQ(&q);
+            break;
+        default:
+            break;
+    }
+
+    json data = json::array();
+    for (QNode* current = q.head; current != nullptr; current = current -> next)
+    {
+        data.push_back(current -> a);
+    }
+    db[name]["type"] = "queue";
+    db[name]["data"] = data;
+
+    freeQ(&q);
+}
