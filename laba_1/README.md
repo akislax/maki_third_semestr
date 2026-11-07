@@ -17,7 +17,7 @@ laba_1/
 
 ```
 make
-./dbms --file data.json --query "SPUSH 5"
+./dbms --file data.json --query "SPUSH mystack 5"
 ```
 
 Команду писать в кавычках.
