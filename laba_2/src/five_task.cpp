@@ -63,6 +63,7 @@ void HuffTree::buildTree(const string& text)
     }
 
     root = nodes[0];
+    buildCodes(root, "");
 }
 
 //мы используем эту фукнцию как? подаем корень и пустое значение потому что корень ""
@@ -93,16 +94,20 @@ string HuffTree::encode(const string& text)
     return result;
 }
 
+
+//Стоишь в корне.
+//Читаешь бит: 0 - шаг влево, 1 - шаг вправо.
+//Попал в букву - записал её и вернулся в корень.
 string HuffTree::decode(const string& bits)
 {
-    string result = "";
+    string result = ""; 
     HuffNode* current = root;     // стоим в корне
 
     for (char b : bits)
     {
         // шаг по дереву
         if (b == '0')
-            current = current->left;
+            current = current->left; //0 levo
         else
             current = current->right;
 
@@ -114,4 +119,28 @@ string HuffTree::decode(const string& bits)
         }
     }
     return result;
+}
+
+void HuffTree::printTable()
+{
+    for (int i = 0; i < 256; i++)
+    {
+        if (codes[i] != "")
+        {
+            cout << (char)i << " : " << codes[i] << endl;
+        }
+    }
+}
+
+void HuffTree::freeTree(HuffNode* node)
+{
+    if (node == nullptr) return;
+    freeTree(node->left);
+    freeTree(node->right);
+    delete node;
+}
+
+HuffTree::~HuffTree()
+{
+    freeTree(root);
 }
