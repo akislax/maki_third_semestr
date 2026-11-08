@@ -1,4 +1,6 @@
 #pragma once
+#include "array_template.h"
+#include <nlohmann/json.hpp>
 
 template <typename T>
 struct Node
@@ -18,6 +20,9 @@ class hashTable
     public:
         void add(const T& key);
         void remove(const T& key);
-        void search(const T& key);
+        bool search(const T& key);
+        void loadFromJson(const nlohmann::json& arr);
+        nlohmann::json saveToJson();
+        void toArray(Array<T>& arr);
         ~hashTable();
 };

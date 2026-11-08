@@ -1,4 +1,4 @@
-#include "laba_2\include\stack.h"
+#include "first_task.h"
 #include <iostream>
 #include <string>
 using namespace std;
