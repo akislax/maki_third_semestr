@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"strconv"
+	"time"
 )
 
 type NodeSix struct {
@@ -89,7 +91,7 @@ func newKukushka() *Kukushka {
 	k.size = 11
 	k.t1 = make([]int, k.size)
 	k.t2 = make([]int, k.size)
-	k.used1 = make([]bool, k.size) // каждая ячейка будет иметь значение false, то есть пусто
+	k.used1 = make([]bool, k.size)
 	k.used2 = make([]bool, k.size)
 	return k
 }
@@ -109,7 +111,7 @@ func (k *Kukushka) moreplace() {
 
 	for i := 0; i < oldSize; i++ {
 		if oldUsed1[i] {
-			k.insert(old1[i]) // insert работает с новыми t1, поэтому
+			k.insert(old1[i])
 		}
 		if oldUsed2[i] {
 			k.insert(old2[i])
@@ -206,4 +208,47 @@ func printFold(key int) {
 		sum += n
 	}
 	fmt.Println(" =", sum)
+}
+
+func compareHash() {
+	sizes := []int{1000, 10000, 50000}
+	rand.Seed(time.Now().UnixNano())
+
+	fmt.Println("Элементов | Цепочки: вставка, поиск (мс) | Кукушка: вставка, поиск (мс)")
+
+	for _, n := range sizes {
+		keys := make([]int, n)
+		for i := 0; i < n; i++ {
+			keys[i] = rand.Intn(1000000)
+		}
+
+		var chain hashTableSix
+		cuckoo := newKukushka()
+
+		start := time.Now()
+		for i := 0; i < n; i++ {
+			chain.add(keys[i])
+		}
+		chainInsert := float64(time.Since(start).Microseconds()) / 1000
+
+		start = time.Now()
+		for i := 0; i < n; i++ {
+			chain.search(keys[i])
+		}
+		chainSearch := float64(time.Since(start).Microseconds()) / 1000
+
+		start = time.Now()
+		for i := 0; i < n; i++ {
+			cuckoo.insert(keys[i])
+		}
+		cuckooInsert := float64(time.Since(start).Microseconds()) / 1000
+
+		start = time.Now()
+		for i := 0; i < n; i++ {
+			cuckoo.search(keys[i])
+		}
+		cuckooSearch := float64(time.Since(start).Microseconds()) / 1000
+
+		fmt.Printf("%d | %.3f, %.3f | %.3f, %.3f\n", n, chainInsert, chainSearch, cuckooInsert, cuckooSearch)
+	}
 }

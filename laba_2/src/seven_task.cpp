@@ -49,8 +49,8 @@ int LRUCache::get(int key)
     }
 
     int value = values.data[index];   // взяли значение, пока знаем где оно
-    moveToEnd(index); //переставили
-    return values.data[values.size - 1]; //вернули, что взяли
+    moveToEnd(index);                 // переставили
+    return value;                     // вернули, что взяли
 }
 
 void LRUCache::set(int key, int value)

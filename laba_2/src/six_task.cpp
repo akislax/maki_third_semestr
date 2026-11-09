@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include <chrono>
+#include <ctime>
 using namespace std;
 
 
@@ -227,4 +229,53 @@ void printFold(const int& key)
         sum += stoi(part);
     }
     cout << " = " << sum << endl;
+}
+void compareHash()
+{
+    int sizes[] = {1000, 10000, 50000};
+    srand(time(nullptr));
+
+    cout << "Элементов | Цепочки: вставка, поиск (мс) | Кукушка: вставка, поиск (мс)" << endl;
+
+    for (int n : sizes)
+    {
+        // случайные числа
+        int* keys = new int[n];
+        for (int i = 0; i < n; i++)
+        {
+            keys[i] = rand() % 1000000;
+        }
+
+        hashTableSix chain;
+        Kukushka cuckoo;
+
+        // цепочки: вставка
+        auto start = chrono::high_resolution_clock::now();
+        for (int i = 0; i < n; i++) chain.add(keys[i]);
+        auto end = chrono::high_resolution_clock::now();
+        double chainInsert = chrono::duration<double, milli>(end - start).count();
+
+        // цепочки: поиск
+        start = chrono::high_resolution_clock::now();
+        for (int i = 0; i < n; i++) chain.search(keys[i]);
+        end = chrono::high_resolution_clock::now();
+        double chainSearch = chrono::duration<double, milli>(end - start).count();
+
+        // кукушка: вставка
+        start = chrono::high_resolution_clock::now();
+        for (int i = 0; i < n; i++) cuckoo.insert(keys[i]);
+        end = chrono::high_resolution_clock::now();
+        double cuckooInsert = chrono::duration<double, milli>(end - start).count();
+
+        // кукушка: поиск
+        start = chrono::high_resolution_clock::now();
+        for (int i = 0; i < n; i++) cuckoo.search(keys[i]);
+        end = chrono::high_resolution_clock::now();
+        double cuckooSearch = chrono::duration<double, milli>(end - start).count();
+
+        cout << n << " | " << chainInsert << ", " << chainSearch
+             << " | " << cuckooInsert << ", " << cuckooSearch << endl;
+
+        delete[] keys;
+    }
 }

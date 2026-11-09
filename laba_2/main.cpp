@@ -23,7 +23,8 @@ enum class OptionForMenu
     FiveTask = 5,
     SixOneTask = 6,
     SixTwoTask = 7,
-    SevenTask = 8
+    CompareTask = 8,
+    SevenTask = 9
 };
 
 int main()
@@ -31,11 +32,18 @@ int main()
     OptionForMenu choice;
     do
     {
-        cout << "\n1 - Стек\n2 - АТД Множество\n3 - Множество\n4 - Массив\n5 - Хаффман\n6 - Хеш-таблица(подзадание 6.1)\n7 - Хеш-таблица(подзадание 6.2)\n8 - Кэш\n0 - Выход\n";
+        cout << "\n1 - Стек\n2 - АТД Множество\n3 - Множество\n4 - Массив\n5 - Хаффман\n"
+             << "6 - Хеш-таблица (подзадание 6.1)\n7 - Хеш-таблица (подзадание 6.2)\n"
+             << "8 - Сравнение кукушки и цепочек\n9 - Кэш\n0 - Выход\n> ";
 
         int input;
-        cin >> input;
-        cin.ignore();
+        if (!(cin >> input))
+        {
+            if (cin.eof()) return 0;      // ввод закончился - выходим
+            cin.clear();                  // ввели не число - чиним cin
+            input = -1;                   // и считаем, что такого пункта нет
+        }
+        cin.ignore(10000, '\n');          // убираем остаток строки вместе с Enter
         choice = static_cast<OptionForMenu>(input);
 
         switch (choice)
@@ -124,22 +132,29 @@ int main()
             getline(cin, line);
 
             stringstream ss(line);
-            Array<int> set;
-            initArray(&set);
+            Array<int> arr;
+            initArray(&arr);
 
             int x;
             while (ss >> x)
             {
-                pushBack(&set, x);
+                pushBack(&arr, x);
             }
 
             cout << "Введите ваше число: ";
+            string numLine;
+            getline(cin, numLine);
+            stringstream numSs(numLine);
             int userInt;
-            cin >> userInt;
-            cin.ignore();
+            if (!(numSs >> userInt))
+            {
+                cout << "Нужно целое число" << endl;
+                freeArray(&arr);
+                break;
+            }
 
-            goodLine(set, userInt);
-            freeArray(&set);
+            goodLine(arr, userInt);
+            freeArray(&arr);
             break;
         }
         case OptionForMenu::FiveTask:
@@ -168,10 +183,12 @@ int main()
         }
         case OptionForMenu::SixOneTask:
         {
-            cout << "1 - Метод цепочек\n2 - Хеширование кукушки\n ";
-            int type;
-            cin >> type;
-            cin.ignore();
+            cout << "1 - Метод цепочек\n2 - Хеширование кукушки\n> ";
+            string typeLine;
+            getline(cin, typeLine);
+            stringstream typeSs(typeLine);
+            int type = 0;
+            typeSs >> type;
 
             if (type != 1 && type != 2)
             {
@@ -186,19 +203,33 @@ int main()
 
             while (true)
             {
+                cout << "> ";
                 string line;
-                getline(cin, line);
+                if (!getline(cin, line)) break;   // ввод закончился
 
                 stringstream ss(line);
                 string cmd;
-                int x;
-                ss >> cmd >> x;
+                ss >> cmd;
 
                 if (cmd == "EXIT")
                 {
                     break;
                 }
-                else if (cmd == "ADD")
+
+                if (cmd != "ADD" && cmd != "DEL" && cmd != "FIND")
+                {
+                    cout << "Неизвестная команда" << endl;
+                    continue;
+                }
+
+                int x;
+                if (!(ss >> x))
+                {
+                    cout << "Нужно целое число" << endl;
+                    continue;
+                }
+
+                if (cmd == "ADD")
                 {
                     if (type == 1)
                         chain.add(x);
@@ -214,7 +245,7 @@ int main()
                         cuckoo.remove(x);
                     cout << "Удалено" << endl;
                 }
-                else if (cmd == "FIND")
+                else
                 {
                     bool found;
                     if (type == 1)
@@ -223,21 +254,28 @@ int main()
                         found = cuckoo.search(x);
                     cout << (found ? "есть" : "нет") << endl;
                 }
-                else
-                {
-                    cout << "Неизвестная команда" << endl;
-                }
             }
             break;
         }
         case OptionForMenu::SixTwoTask:
         {
             cout << "Введите число: ";
+            string numLine;
+            getline(cin, numLine);
+            stringstream numSs(numLine);
             int x;
-            cin >> x;
-            cin.ignore();
+            if (!(numSs >> x))
+            {
+                cout << "Нужно целое число" << endl;
+                break;
+            }
 
             printFold(x);
+            break;
+        }
+        case OptionForMenu::CompareTask:
+        {
+            compareHash();
             break;
         }
         case OptionForMenu::SevenTask:
@@ -249,6 +287,14 @@ int main()
             cout << "Количество запросов: ";
             int q;
             cin >> q;
+
+            if (!cin || cap <= 0 || q < 0)
+            {
+                cout << "Нужны положительные целые числа" << endl;
+                cin.clear();
+                cin.ignore(10000, '\n');
+                break;
+            }
 
             LRUCache cache(cap);
 
@@ -272,7 +318,8 @@ int main()
                 }
             }
             cout << endl;
-            cin.ignore();
+            cin.clear();
+            cin.ignore(10000, '\n');
             break;
         }
         case OptionForMenu::Exit:

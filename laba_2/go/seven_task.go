@@ -40,28 +40,25 @@ func (c *LRUCache) get(key int) int {
 		return -1
 	}
 
-	value := c.values.data[index] // взяли значение, пока знаем где оно
-	c.moveToEnd(index)            // переставили
-	return value                  // вернули, что взяли
+	value := c.values.data[index]
+	c.moveToEnd(index)
+	return value
 }
 
 func (c *LRUCache) set(key int, value int) {
 	index := c.find(key)
 
-	// ключ уже есть
 	if index != -1 {
-		c.values.data[index] = value // новое значение
-		c.moveToEnd(index)           // стал свежим
+		c.values.data[index] = value
+		c.moveToEnd(index)
 		return
 	}
 
-	// ключа нет, а места нет
 	if c.keys.size == c.mesto {
-		arrayRemoveAt(&c.keys, 0) // самый старый - на месте 0
+		arrayRemoveAt(&c.keys, 0)
 		arrayRemoveAt(&c.values, 0)
 	}
 
-	// добавляем в конец
 	arrayPushBack(&c.keys, key)
 	arrayPushBack(&c.values, value)
 }

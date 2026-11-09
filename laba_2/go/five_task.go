@@ -10,7 +10,7 @@ type HuffNode struct {
 }
 
 type HuffTree struct {
-	codes [256]string // это хранение 0 и 1 для дерева
+	codes [256]string
 	root  *HuffNode
 }
 
@@ -24,18 +24,15 @@ func takesMin(nodes []*HuffNode, count *int) *HuffNode {
 	}
 
 	result := nodes[mini]
-	// запомнили самый маленький
 
-	// затерли
 	nodes[mini] = nodes[*count-1]
 	*count--
 
 	return result
 }
 
-// count - сколько узлов!!!!!
 func (h *HuffTree) buildTree(text string) {
-	var nodes [256]*HuffNode // byte принимает от 0 до 255 значений поэтому 256
+	var nodes [256]*HuffNode
 
 	count := 0
 
@@ -71,7 +68,6 @@ func (h *HuffTree) buildTree(text string) {
 	h.buildCodes(h.root, "")
 }
 
-// подаем корень и пустое значение, потому что у корня путь ""
 func (h *HuffTree) buildCodes(node *HuffNode, code string) {
 	if node == nil {
 		return
@@ -86,7 +82,6 @@ func (h *HuffTree) buildCodes(node *HuffNode, code string) {
 	h.buildCodes(node.right, code+"1")
 }
 
-// берет из таблицы codes значения и просто выводит результат в виде 0101010
 func (h *HuffTree) encode(text string) string {
 	result := ""
 	for i := 0; i < len(text); i++ {
@@ -95,25 +90,20 @@ func (h *HuffTree) encode(text string) string {
 	return result
 }
 
-// Стоишь в корне.
-// Читаешь бит: 0 - шаг влево, 1 - шаг вправо.
-// Попал в букву - записал её и вернулся в корень.
 func (h *HuffTree) decode(bits string) string {
 	result := []byte{}
-	current := h.root // стоим в корне
+	current := h.root
 
 	for i := 0; i < len(bits); i++ {
-		// шаг по дереву
 		if bits[i] == '0' {
-			current = current.left // 0 влево
+			current = current.left
 		} else {
 			current = current.right
 		}
 
-		// дошли до буквы?
 		if current.left == nil && current.right == nil {
-			result = append(result, current.symbol) // записали букву
-			current = h.root                        // вернулись в корень
+			result = append(result, current.symbol)
+			current = h.root
 		}
 	}
 	return string(result)

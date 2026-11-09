@@ -45,3 +45,4 @@ class Kukushka
     void remove(const int& key);
 };
 void printFold(const int& key);
+void compareHash();
