@@ -39,11 +39,12 @@ int main()
         int input;
         if (!(cin >> input))
         {
-            if (cin.eof()) return 0;      // ввод закончился - выходим
-            cin.clear();                  // ввели не число - чиним cin
-            input = -1;                   // и считаем, что такого пункта нет
+            if (cin.eof())
+                return 0; // ввод закончился - выходим
+            cin.clear();  // ввели не число - чиним cin
+            input = -1;   // и считаем, что такого пункта нет
         }
-        cin.ignore(10000, '\n');          // убираем остаток строки вместе с Enter
+        cin.ignore(10000, '\n'); // убираем остаток строки вместе с Enter
         choice = static_cast<OptionForMenu>(input);
 
         switch (choice)
@@ -199,78 +200,77 @@ int main()
             hashTableSix chain;
             Kukushka cuckoo;
 
-            cout << "Команды: ADD x, DEL x, FIND x, EXIT" << endl;
+            cout << "Команды: ADD ключ значение, FIND ключ, DEL ключ, EXIT" << endl;
 
             while (true)
             {
                 cout << "> ";
                 string line;
-                if (!getline(cin, line)) break;   // ввод закончился
+                if (!getline(cin, line))
+                    break;
 
                 stringstream ss(line);
-                string cmd;
-                ss >> cmd;
+                string cmd, key, value;
+                ss >> cmd >> key >> value;
 
                 if (cmd == "EXIT")
                 {
                     break;
                 }
-
-                if (cmd != "ADD" && cmd != "DEL" && cmd != "FIND")
+                else if (cmd == "ADD")
                 {
-                    cout << "Неизвестная команда" << endl;
-                    continue;
-                }
-
-                int x;
-                if (!(ss >> x))
-                {
-                    cout << "Нужно целое число" << endl;
-                    continue;
-                }
-
-                if (cmd == "ADD")
-                {
+                    if (key == "" || value == "")
+                    {
+                        cout << "Нужно: ADD ключ значение" << endl;
+                        continue;
+                    }
                     if (type == 1)
-                        chain.add(x);
+                        chain.add(key, value);
                     else
-                        cuckoo.insert(x);
+                        cuckoo.insert(key, value);
                     cout << "Добавлено" << endl;
+                }
+                else if (cmd == "FIND")
+                {
+                    string found;
+                    if (type == 1)
+                        found = chain.search(key);
+                    else
+                        found = cuckoo.search(key);
+
+                    if (found == "")
+                        cout << "Ключ не найден" << endl;
+                    else
+                        cout << key << " -> " << found << endl;
                 }
                 else if (cmd == "DEL")
                 {
                     if (type == 1)
-                        chain.remove(x);
+                        chain.remove(key);
                     else
-                        cuckoo.remove(x);
+                        cuckoo.remove(key);
                     cout << "Удалено" << endl;
                 }
                 else
                 {
-                    bool found;
-                    if (type == 1)
-                        found = chain.search(x);
-                    else
-                        found = cuckoo.search(x);
-                    cout << (found ? "есть" : "нет") << endl;
+                    cout << "Неизвестная команда" << endl;
                 }
             }
             break;
         }
         case OptionForMenu::SixTwoTask:
         {
-            cout << "Введите число: ";
-            string numLine;
-            getline(cin, numLine);
-            stringstream numSs(numLine);
-            int x;
-            if (!(numSs >> x))
+            cout << "Введите ключ: ";
+            string key;
+            getline(cin, key);
+
+            if (key == "")
             {
-                cout << "Нужно целое число" << endl;
+                cout << "Пустой ключ" << endl;
                 break;
             }
 
-            printFold(x);
+            printFold(key);
             break;
         }
         case OptionForMenu::CompareTask:

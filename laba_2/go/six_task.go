@@ -7,8 +7,27 @@ import (
 	"time"
 )
 
+func foldSum(key string) int {
+	sum := 0
+	for i := 0; i < len(key); i += 3 {
+		end := i + 3
+		if end > len(key) {
+			end = len(key)
+		}
+		part := key[i:end]
+
+		num := 0
+		for j := 0; j < len(part); j++ {
+			num = num*10 + int(part[j]) - '0'
+		}
+		sum += num
+	}
+	return absInt(sum)
+}
+
 type NodeSix struct {
-	value int
+	key   string
+	value string
 	next  *NodeSix
 }
 
@@ -16,53 +35,46 @@ type hashTableSix struct {
 	table [SIZE]*NodeSix
 }
 
-func foldSum(key int) int {
-	s := strconv.Itoa(absInt(key))
-	sum := 0
-	for i := 0; i < len(s); i += 3 {
-		end := i + 3
-		if end > len(s) {
-			end = len(s)
-		}
-		part, _ := strconv.Atoi(s[i:end])
-		sum += part
-	}
-	return sum
-}
-
-func (t *hashTableSix) hashKeySix(key int) int {
+func (t *hashTableSix) hashKeySix(key string) int {
 	return foldSum(key) % SIZE
 }
 
-func (t *hashTableSix) search(key int) bool {
+func (t *hashTableSix) search(key string) string {
 	index := t.hashKeySix(key)
 	current := t.table[index]
 	for current != nil {
-		if current.value == key {
-			return true
+		if current.key == key {
+			return current.value
 		}
 		current = current.next
 	}
-	return false
+	return ""
 }
 
-func (t *hashTableSix) add(key int) {
-	if t.search(key) {
-		return
-	}
+func (t *hashTableSix) add(key string, value string) {
 	index := t.hashKeySix(key)
-	newNode := &NodeSix{key, t.table[index]}
+
+	current := t.table[index]
+	for current != nil {
+		if current.key == key {
+			current.value = value
+			return
+		}
+		current = current.next
+	}
+
+	newNode := &NodeSix{key, value, t.table[index]}
 	t.table[index] = newNode
 }
 
-func (t *hashTableSix) remove(key int) {
+func (t *hashTableSix) remove(key string) {
 	index := t.hashKeySix(key)
 
 	current := t.table[index]
 	var prev *NodeSix = nil
 
 	for current != nil {
-		if current.value == key {
+		if current.key == key {
 			if prev == nil {
 				t.table[index] = current.next
 			} else {
@@ -70,7 +82,6 @@ func (t *hashTableSix) remove(key int) {
 			}
 			return
 		}
-
 		prev = current
 		current = current.next
 	}
@@ -80,8 +91,10 @@ const MAXTEMPT = 50
 
 type Kukushka struct {
 	size  int
-	t1    []int
-	t2    []int
+	keys1 []string
+	vals1 []string
+	keys2 []string
+	vals2 []string
 	used1 []bool
 	used2 []bool
 }
@@ -89,125 +102,140 @@ type Kukushka struct {
 func newKukushka() *Kukushka {
 	k := &Kukushka{}
 	k.size = 11
-	k.t1 = make([]int, k.size)
-	k.t2 = make([]int, k.size)
+	k.keys1 = make([]string, k.size)
+	k.vals1 = make([]string, k.size)
+	k.keys2 = make([]string, k.size)
+	k.vals2 = make([]string, k.size)
 	k.used1 = make([]bool, k.size)
 	k.used2 = make([]bool, k.size)
 	return k
 }
 
+func (k *Kukushka) hash1(key string) int {
+	return foldSum(key) % k.size
+}
+
+func (k *Kukushka) hash2(key string) int {
+	var h uint64 = 0
+	for i := 0; i < len(key); i++ {
+		h = h*31 + uint64(key[i])
+	}
+	return int(h % uint64(k.size))
+}
+
 func (k *Kukushka) moreplace() {
 	oldSize := k.size
-	old1 := k.t1
-	old2 := k.t2
+	oldKeys1 := k.keys1
+	oldVals1 := k.vals1
+	oldKeys2 := k.keys2
+	oldVals2 := k.vals2
 	oldUsed1 := k.used1
 	oldUsed2 := k.used2
 
 	k.size = k.size * 2
-	k.t1 = make([]int, k.size)
-	k.t2 = make([]int, k.size)
+	k.keys1 = make([]string, k.size)
+	k.vals1 = make([]string, k.size)
+	k.keys2 = make([]string, k.size)
+	k.vals2 = make([]string, k.size)
 	k.used1 = make([]bool, k.size)
 	k.used2 = make([]bool, k.size)
 
 	for i := 0; i < oldSize; i++ {
 		if oldUsed1[i] {
-			k.insert(old1[i])
+			k.insert(oldKeys1[i], oldVals1[i])
 		}
 		if oldUsed2[i] {
-			k.insert(old2[i])
+			k.insert(oldKeys2[i], oldVals2[i])
 		}
 	}
 }
 
-func (k *Kukushka) hash1(key int) int {
-	return foldSum(key) % k.size
-}
-
-func (k *Kukushka) hash2(key int) int {
-	h := key % k.size
-	if h < 0 {
-		h += k.size
-	}
-	return h
-}
-
-func (k *Kukushka) search(key int) bool {
+func (k *Kukushka) search(key string) string {
 	i1 := k.hash1(key)
-	if k.used1[i1] && k.t1[i1] == key {
-		return true
+	if k.used1[i1] && k.keys1[i1] == key {
+		return k.vals1[i1]
 	}
 
 	i2 := k.hash2(key)
-	if k.used2[i2] && k.t2[i2] == key {
-		return true
+	if k.used2[i2] && k.keys2[i2] == key {
+		return k.vals2[i2]
 	}
-	return false
+	return ""
 }
 
-func (k *Kukushka) insert(key int) {
-	if k.search(key) {
+func (k *Kukushka) insert(key string, value string) {
+	i1 := k.hash1(key)
+	if k.used1[i1] && k.keys1[i1] == key {
+		k.vals1[i1] = value
+		return
+	}
+	i2 := k.hash2(key)
+	if k.used2[i2] && k.keys2[i2] == key {
+		k.vals2[i2] = value
 		return
 	}
 
-	cur := key
+	curKey := key
+	curVal := value
 
 	for tempt := 0; tempt < MAXTEMPT; tempt++ {
-		i1 := k.hash1(cur)
-
+		i1 = k.hash1(curKey)
 		if k.used1[i1] == false {
-			k.t1[i1] = cur
+			k.keys1[i1] = curKey
+			k.vals1[i1] = curVal
 			k.used1[i1] = true
 			return
 		}
+		k.keys1[i1], curKey = curKey, k.keys1[i1]
+		k.vals1[i1], curVal = curVal, k.vals1[i1]
 
-		tmp := k.t1[i1]
-		k.t1[i1] = cur
-		cur = tmp
-
-		i2 := k.hash2(cur)
+		i2 = k.hash2(curKey)
 		if k.used2[i2] == false {
-			k.t2[i2] = cur
+			k.keys2[i2] = curKey
+			k.vals2[i2] = curVal
 			k.used2[i2] = true
 			return
 		}
-		tmp = k.t2[i2]
-		k.t2[i2] = cur
-		cur = tmp
+		k.keys2[i2], curKey = curKey, k.keys2[i2]
+		k.vals2[i2], curVal = curVal, k.vals2[i2]
 	}
+
 	k.moreplace()
-	k.insert(cur)
+	k.insert(curKey, curVal)
 }
 
-func (k *Kukushka) remove(key int) {
+func (k *Kukushka) remove(key string) {
 	i1 := k.hash1(key)
-	if k.used1[i1] && k.t1[i1] == key {
+	if k.used1[i1] && k.keys1[i1] == key {
 		k.used1[i1] = false
 		return
 	}
 	i2 := k.hash2(key)
-	if k.used2[i2] && k.t2[i2] == key {
+	if k.used2[i2] && k.keys2[i2] == key {
 		k.used2[i2] = false
-		return
 	}
 }
 
-func printFold(key int) {
-	s := strconv.Itoa(absInt(key))
+func printFold(key string) {
 	sum := 0
-	for i := 0; i < len(s); i += 3 {
+	for i := 0; i < len(key); i += 3 {
 		end := i + 3
-		if end > len(s) {
-			end = len(s)
+		if end > len(key) {
+			end = len(key)
 		}
-		part := s[i:end]
+		part := key[i:end]
 		if i > 0 {
 			fmt.Print("+")
 		}
 		fmt.Print(part)
-		n, _ := strconv.Atoi(part)
-		sum += n
+
+		num := 0
+		for j := 0; j < len(part); j++ {
+			num = num*10 + int(part[j]) - '0'
+		}
+		sum += num
 	}
-	fmt.Println(" =", sum)
+	fmt.Println(" =", absInt(sum))
 }
 
 func compareHash() {
@@ -217,9 +245,11 @@ func compareHash() {
 	fmt.Println("Элементов | Цепочки: вставка, поиск (мс) | Кукушка: вставка, поиск (мс)")
 
 	for _, n := range sizes {
-		keys := make([]int, n)
+		keys := make([]string, n)
+		values := make([]string, n)
 		for i := 0; i < n; i++ {
-			keys[i] = rand.Intn(1000000)
+			keys[i] = strconv.Itoa(rand.Intn(1000000))
+			values[i] = "value" + strconv.Itoa(i)
 		}
 
 		var chain hashTableSix
@@ -227,7 +257,7 @@ func compareHash() {
 
 		start := time.Now()
 		for i := 0; i < n; i++ {
-			chain.add(keys[i])
+			chain.add(keys[i], values[i])
 		}
 		chainInsert := float64(time.Since(start).Microseconds()) / 1000
 
@@ -239,7 +269,7 @@ func compareHash() {
 
 		start = time.Now()
 		for i := 0; i < n; i++ {
-			cuckoo.insert(keys[i])
+			cuckoo.insert(keys[i], values[i])
 		}
 		cuckooInsert := float64(time.Since(start).Microseconds()) / 1000
 

@@ -204,7 +204,7 @@ func main() {
 			var chain hashTableSix
 			cuckoo := newKukushka()
 
-			fmt.Println("Команды: ADD x, DEL x, FIND x, EXIT")
+			fmt.Println("Команды: ADD ключ значение, FIND ключ, DEL ключ, EXIT")
 
 			for {
 				fmt.Print("> ")
@@ -214,68 +214,65 @@ func main() {
 				}
 
 				fields := strings.Fields(cmdLine)
-				cmd := ""
+				cmd, key, value := "", "", ""
 				if len(fields) > 0 {
 					cmd = fields[0]
+				}
+				if len(fields) > 1 {
+					key = fields[1]
+				}
+				if len(fields) > 2 {
+					value = fields[2]
 				}
 
 				if cmd == "EXIT" {
 					break
-				}
-
-				if cmd != "ADD" && cmd != "DEL" && cmd != "FIND" {
-					fmt.Println("Неизвестная команда")
-					continue
-				}
-
-				if len(fields) < 2 {
-					fmt.Println("Нужно целое число")
-					continue
-				}
-				x, err := strconv.Atoi(fields[1])
-				if err != nil {
-					fmt.Println("Нужно целое число")
-					continue
-				}
-
-				if cmd == "ADD" {
+				} else if cmd == "ADD" {
+					if key == "" || value == "" {
+						fmt.Println("Нужно: ADD ключ значение")
+						continue
+					}
 					if tableType == 1 {
-						chain.add(x)
+						chain.add(key, value)
 					} else {
-						cuckoo.insert(x)
+						cuckoo.insert(key, value)
 					}
 					fmt.Println("Добавлено")
+				} else if cmd == "FIND" {
+					found := ""
+					if tableType == 1 {
+						found = chain.search(key)
+					} else {
+						found = cuckoo.search(key)
+					}
+
+					if found == "" {
+						fmt.Println("Ключ не найден")
+					} else {
+						fmt.Println(key, "->", found)
+					}
 				} else if cmd == "DEL" {
 					if tableType == 1 {
-						chain.remove(x)
+						chain.remove(key)
 					} else {
-						cuckoo.remove(x)
+						cuckoo.remove(key)
 					}
 					fmt.Println("Удалено")
 				} else {
-					found := false
-					if tableType == 1 {
-						found = chain.search(x)
-					} else {
-						found = cuckoo.search(x)
-					}
-					if found {
-						fmt.Println("есть")
-					} else {
-						fmt.Println("нет")
-					}
+					fmt.Println("Неизвестная команда")
 				}
 			}
 
 		case SixTwoTask:
-			fmt.Print("Введите число: ")
-			numLine, _ := readLine()
-			x, err := strconv.Atoi(strings.TrimSpace(numLine))
-			if err != nil {
-				fmt.Println("Нужно целое число")
+			fmt.Print("Введите ключ: ")
+			key, _ := readLine()
+
+			if key == "" {
+				fmt.Println("Пустой ключ")
 				break
 			}
-			printFold(x)
+
+			printFold(key)
 
 		case CompareTask:
 			compareHash()

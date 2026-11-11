@@ -1,48 +1,52 @@
 #pragma once
+#include <string>
 using namespace std;
-
 
 struct NodeSix
 {
-    int value;
-    NodeSix* next; 
+    string key;
+    string value;
+    NodeSix* next;
 };
 
 class hashTableSix
 {
-    private:
-        static const int SIZE = 100;
-        NodeSix* table[SIZE] = {};
-        int hashKeySix(const int& key);
+private:
+    static const int SIZE = 100;
+    NodeSix* table[SIZE] = {};
+    int hashKeySix(const string& key);
 
-    public:
-        void add(const int& key);
-        void remove(const int& key);
-        bool search(const int& key);
-        ~hashTableSix();
+public:
+    void add(const string& key, const string& value);
+    void remove(const string& key);
+    string search(const string& key);
+    ~hashTableSix();
 };
 
 class Kukushka
 {
-    private:
-    
+private:
     static const int MAXTEMPT = 50;
     int size;
-    int* t1;
-    int* t2;
+    string* keys1;
+    string* vals1;
+    string* keys2;
+    string* vals2;
     bool* used1;
     bool* used2;
-    
-    int hash1(const int& key);
-    int hash2(const int& key);
+
+    int hash1(const string& key);
+    int hash2(const string& key);
     void moreplace();
 
-    public:
+public:
     Kukushka();
     ~Kukushka();
-    void insert(const int& key);
-    bool search(const int& key);
-    void remove(const int& key);
+    void insert(const string& key, const string& value);
+    string search(const string& key);
+    void remove(const string& key);
 };
-void printFold(const int& key);
+
+int foldSum(const string& key);
+void printFold(const string& key);
 void compareHash();
