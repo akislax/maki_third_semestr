@@ -1,0 +1,24 @@
+#pragma once
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <nlohmann/json.hpp>
+using namespace std;
+using json = nlohmann::json;
+
+enum class Command
+{
+    MPUSH, MINSERT, MGET, MSET, MDEL, MLEN, MPRINT,
+    FPUSHH, FPUSHT, FPUSHA, FPUSHB, FDELH, FDELT, FDELA, FDELB, FDEL, FFIND, FPRINT, FPRINTR,
+    LPUSHH, LPUSHT, LPUSHA, LPUSHB, LDELH, LDELT, LDELA, LDELB, LDEL, LFIND, LPRINT, LPRINTR,
+    SPUSH, SPOP, SPRINT,
+    QPUSH, QPOP, QPRINT,
+    TINSERT, TFIND, TCOMPLETE, TPRINT,
+    HADD, HDEL, HFIND, HPRINT,
+    KADD, KDEL, KFIND, KPRINT,
+    PRINT,
+    UNKNOWN
+};
+
+Command toCommand(const string& text);
+bool wrongType(json& db, const string& name, const string& type);

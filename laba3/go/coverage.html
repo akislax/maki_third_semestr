@@ -1,0 +1,2050 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>structures: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">laba3go/structures/array.go (100.0%)</option>
+				
+				<option value="file1">laba3go/structures/commands.go (91.7%)</option>
+				
+				<option value="file2">laba3go/structures/dlist.go (100.0%)</option>
+				
+				<option value="file3">laba3go/structures/flist.go (99.3%)</option>
+				
+				<option value="file4">laba3go/structures/hashtable.go (99.4%)</option>
+				
+				<option value="file5">laba3go/structures/queue.go (100.0%)</option>
+				
+				<option value="file6">laba3go/structures/serialize.go (100.0%)</option>
+				
+				<option value="file7">laba3go/structures/stack.go (100.0%)</option>
+				
+				<option value="file8">laba3go/structures/tree.go (99.2%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package structures
+
+import (
+        "fmt"
+        "io"
+        "os"
+)
+
+// Array - динамический массив строк.
+type Array struct {
+        data     []string
+        size     int
+        capacity int
+}
+
+// NewArray создает пустой массив с начальной вместимостью 4.
+func NewArray() *Array {
+        <span class="cov8" title="1">capacity := 4
+        return &amp;Array{data: make([]string, capacity), size: 0, capacity: capacity}
+</span>}
+
+// resizeArray увеличивает вместимость массива в два раза.
+func (arr *Array) resizeArray() {
+        <span class="cov8" title="1">newCapacity := arr.capacity * 2
+        newData := make([]string, newCapacity)
+        for i := 0; i &lt; arr.size; i++ </span>{
+                <span class="cov8" title="1">newData[i] = arr.data[i]
+</span>        }
+        <span class="cov8" title="1">arr.data = newData
+        arr.capacity = newCapacity</span>
+}
+
+// PushBack добавляет элемент в конец.
+func (arr *Array) PushBack(text string) {
+        <span class="cov8" title="1">if arr.size &gt;= arr.capacity </span>{
+                <span class="cov8" title="1">arr.resizeArray()
+</span>        }
+        <span class="cov8" title="1">arr.data[arr.size] = text
+        arr.size++</span>
+}
+
+// InsertAt вставляет элемент на место index.
+func (arr *Array) InsertAt(text string, index int) {
+        <span class="cov8" title="1">if index &lt; 0 || index &gt; arr.size </span>{
+                <span class="cov8" title="1">fmt.Println("такого индекса нету")
+                return
+</span>        }
+
+        <span class="cov8" title="1">if arr.size == arr.capacity </span>{
+                <span class="cov8" title="1">arr.resizeArray()
+</span>        }
+
+        // сдвигаем элементы вправо, начиная с последнего,
+        // чтобы не затереть соседа справа
+        <span class="cov8" title="1">for i := arr.size - 1; i &gt;= index; i-- </span>{
+                <span class="cov8" title="1">arr.data[i+1] = arr.data[i]
+</span>        }
+
+        <span class="cov8" title="1">arr.data[index] = text
+        arr.size++</span>
+}
+
+// RemoveAt удаляет элемент с места index.
+func (arr *Array) RemoveAt(index int) {
+        <span class="cov8" title="1">if index &lt; 0 || index &gt;= arr.size </span>{
+                <span class="cov8" title="1">fmt.Println("такого индекса нету")
+                return
+</span>        }
+
+        // сдвигаем элементы влево, удаляемый затирается первым
+        <span class="cov8" title="1">for i := index; i &lt; arr.size-1; i++ </span>{
+                <span class="cov8" title="1">arr.data[i] = arr.data[i+1]
+</span>        }
+        <span class="cov8" title="1">arr.size--</span>
+}
+
+// SetAt заменяет элемент на месте index.
+func (arr *Array) SetAt(text string, index int) {
+        <span class="cov8" title="1">if index &lt; 0 || index &gt;= arr.size </span>{
+                <span class="cov8" title="1">fmt.Println("такого индекса нету")
+                return
+</span>        }
+        <span class="cov8" title="1">arr.data[index] = text</span>
+}
+
+// GetAt возвращает элемент с места index.
+// При неверном индексе возвращает пустую строку.
+func (arr *Array) GetAt(index int) string {
+        <span class="cov8" title="1">if index &lt; 0 || index &gt;= arr.size </span>{
+                <span class="cov8" title="1">fmt.Println("Нет такого индекса")
+                return ""
+</span>        }
+        <span class="cov8" title="1">return arr.data[index]</span>
+}
+
+// PrintArray печатает все элементы, размер и вместимость.
+func (arr *Array) PrintArray() {
+        <span class="cov8" title="1">for i := 0; i &lt; arr.size; i++ </span>{
+                <span class="cov8" title="1">fmt.Print(arr.data[i], " ")
+</span>        }
+        <span class="cov8" title="1">fmt.Printf("(size=%d, capacity=%d)\n", arr.size, arr.capacity)</span>
+}
+
+// Length возвращает количество элементов.
+func (arr *Array) Length() int {
+        <span class="cov8" title="1">return arr.size
+</span>}
+
+// HandleArray выполняет команду над массивом с именем name.
+func HandleArray(command Command, db DB, name string, ss io.Reader) {
+        <span class="cov8" title="1">if WrongType(db, name, "array") </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">arr := NewArray()
+        for _, item := range loadStrings(db, name) </span>{
+                <span class="cov8" title="1">arr.PushBack(item)
+</span>        }
+
+        <span class="cov8" title="1">var index int
+        var value string
+        switch command </span>{
+        case MPUSH:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                arr.PushBack(value)
+                fmt.Println("-&gt;", value)</span>
+        case MINSERT:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;index, &amp;value)
+                arr.InsertAt(value, index)</span>
+        case MGET:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;index)
+                fmt.Println("-&gt;", arr.GetAt(index))</span>
+        case MSET:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;index, &amp;value)
+                arr.SetAt(value, index)</span>
+        case MDEL:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;index)
+                arr.RemoveAt(index)</span>
+        case MLEN:
+                <span class="cov8" title="1">fmt.Println("-&gt;", arr.Length())</span>
+        case MPRINT:
+                <span class="cov8" title="1">arr.PrintArray()</span>
+        }
+
+        <span class="cov8" title="1">items := make([]string, 0, arr.Length())
+        for i := 0; i &lt; arr.Length(); i++ </span>{
+                <span class="cov8" title="1">items = append(items, arr.GetAt(i))
+</span>        }
+        <span class="cov8" title="1">saveStrings(db, name, "array", items)</span>
+}
+
+// SaveBinary сохраняет массив в бинарный файл:
+// количество элементов, затем строки.
+func (arr *Array) SaveBinary(fileName string) {
+        <span class="cov8" title="1">out, err := os.Create(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer out.Close()
+</span>
+        <span class="cov8" title="1">writeInt(out, arr.size)
+        for i := 0; i &lt; arr.size; i++ </span>{
+                <span class="cov8" title="1">writeString(out, arr.data[i])
+</span>        }
+}
+
+// LoadBinary загружает массив из бинарного файла.
+// Старые элементы перед загрузкой удаляются.
+func (arr *Array) LoadBinary(fileName string) {
+        <span class="cov8" title="1">in, err := os.Open(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer in.Close()
+</span>
+        <span class="cov8" title="1">arr.size = 0
+        count := readInt(in)
+        for i := 0; i &lt; count; i++ </span>{
+                <span class="cov8" title="1">arr.PushBack(readString(in))
+</span>        }
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package structures
+
+import (
+        "encoding/json"
+        "fmt"
+)
+
+// Command - команда, которую ввел пользователь.
+type Command int
+
+const (
+        MPUSH Command = iota
+        MINSERT
+        MGET
+        MSET
+        MDEL
+        MLEN
+        MPRINT
+
+        FPUSHH
+        FPUSHT
+        FPUSHA
+        FPUSHB
+        FDELH
+        FDELT
+        FDELA
+        FDELB
+        FDEL
+        FFIND
+        FPRINT
+        FPRINTR
+
+        LPUSHH
+        LPUSHT
+        LPUSHA
+        LPUSHB
+        LDELH
+        LDELT
+        LDELA
+        LDELB
+        LDEL
+        LFIND
+        LPRINT
+        LPRINTR
+
+        SPUSH
+        SPOP
+        SPRINT
+
+        QPUSH
+        QPOP
+        QPRINT
+
+        TINSERT
+        TFIND
+        TCOMPLETE
+        TPRINT
+
+        HADD
+        HDEL
+        HFIND
+        HPRINT
+
+        KADD
+        KDEL
+        KFIND
+        KPRINT
+
+        PRINT
+        UNKNOWN
+)
+
+// commandNames связывает текст команды с ее значением.
+var commandNames = map[string]Command{
+        "MPUSH": MPUSH, "MINSERT": MINSERT, "MGET": MGET, "MSET": MSET,
+        "MDEL": MDEL, "MLEN": MLEN, "MPRINT": MPRINT,
+
+        "FPUSHH": FPUSHH, "FPUSHT": FPUSHT, "FPUSHA": FPUSHA, "FPUSHB": FPUSHB,
+        "FDELH": FDELH, "FDELT": FDELT, "FDELA": FDELA, "FDELB": FDELB,
+        "FDEL": FDEL, "FFIND": FFIND, "FPRINT": FPRINT, "FPRINTR": FPRINTR,
+
+        "LPUSHH": LPUSHH, "LPUSHT": LPUSHT, "LPUSHA": LPUSHA, "LPUSHB": LPUSHB,
+        "LDELH": LDELH, "LDELT": LDELT, "LDELA": LDELA, "LDELB": LDELB,
+        "LDEL": LDEL, "LFIND": LFIND, "LPRINT": LPRINT, "LPRINTR": LPRINTR,
+
+        "SPUSH": SPUSH, "SPOP": SPOP, "SPRINT": SPRINT,
+
+        "QPUSH": QPUSH, "QPOP": QPOP, "QPRINT": QPRINT,
+
+        "TINSERT": TINSERT, "TFIND": TFIND, "TCOMPLETE": TCOMPLETE, "TPRINT": TPRINT,
+
+        "HADD": HADD, "HDEL": HDEL, "HFIND": HFIND, "HPRINT": HPRINT,
+
+        "KADD": KADD, "KDEL": KDEL, "KFIND": KFIND, "KPRINT": KPRINT,
+
+        "PRINT": PRINT,
+}
+
+// ToCommand превращает текст команды в Command.
+// Если такой команды нет, возвращает UNKNOWN.
+func ToCommand(text string) Command {
+        <span class="cov8" title="1">if command, ok := commandNames[text]; ok </span>{
+                <span class="cov8" title="1">return command
+</span>        }
+        <span class="cov8" title="1">return UNKNOWN</span>
+}
+
+// Entry - одна структура в файле базы: ее тип и данные.
+type Entry struct {
+        Type string          `json:"type"`
+        Data json.RawMessage `json:"data"`
+}
+
+// DB - вся база: имя структуры и ее запись.
+type DB map[string]*Entry
+
+// WrongType проверяет, что под этим именем не лежит структура другого типа.
+func WrongType(db DB, name, typ string) bool {
+        <span class="cov8" title="1">entry, ok := db[name]
+        if ok &amp;&amp; entry.Type != typ </span>{
+                <span class="cov8" title="1">fmt.Println(name, "это не", typ)
+                return true
+</span>        }
+        <span class="cov8" title="1">return false</span>
+}
+
+// loadStrings достает из базы данные структуры, которая хранит строки.
+func loadStrings(db DB, name string) []string {
+        <span class="cov8" title="1">var items []string
+        if entry, ok := db[name]; ok </span>{
+                <span class="cov8" title="1">_ = json.Unmarshal(entry.Data, &amp;items)
+</span>        }
+        <span class="cov8" title="1">return items</span>
+}
+
+// loadInts достает из базы данные структуры, которая хранит числа.
+func loadInts(db DB, name string) []int {
+        <span class="cov8" title="1">var items []int
+        if entry, ok := db[name]; ok </span>{
+                <span class="cov8" title="1">_ = json.Unmarshal(entry.Data, &amp;items)
+</span>        }
+        <span class="cov8" title="1">return items</span>
+}
+
+// saveStrings записывает структуру со строками в базу.
+func saveStrings(db DB, name, typ string, items []string) {
+        <span class="cov8" title="1">if items == nil </span>{
+                <span class="cov0" title="0">items = []string{}
+</span>        }
+        <span class="cov8" title="1">data, _ := json.Marshal(items)
+        db[name] = &amp;Entry{Type: typ, Data: data}</span>
+}
+
+// saveInts записывает структуру с числами в базу.
+func saveInts(db DB, name, typ string, items []int) {
+        <span class="cov8" title="1">if items == nil </span>{
+                <span class="cov0" title="0">items = []int{}
+</span>        }
+        <span class="cov8" title="1">data, _ := json.Marshal(items)
+        db[name] = &amp;Entry{Type: typ, Data: data}</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package structures
+
+import (
+        "fmt"
+        "io"
+        "os"
+)
+
+// DNode - узел двусвязного списка.
+type DNode struct {
+        Person string
+        Next   *DNode
+        Prev   *DNode
+}
+
+// Dlist - двусвязный список с головой и хвостом.
+type Dlist struct {
+        head *DNode
+        tail *DNode
+}
+
+// NewDlist создает пустой список.
+func NewDlist() *Dlist {
+        <span class="cov8" title="1">return &amp;Dlist{}
+</span>}
+
+// IsEmptyList проверяет, пуст ли список.
+func (dl *Dlist) IsEmptyList() bool {
+        <span class="cov8" title="1">return dl.head == nil &amp;&amp; dl.tail == nil
+</span>}
+
+// PushBack добавляет элемент в конец.
+func (dl *Dlist) PushBack(name string) {
+        <span class="cov8" title="1">newNode := &amp;DNode{Person: name}
+</span>
+        <span class="cov8" title="1">if dl.IsEmptyList() </span>{
+                <span class="cov8" title="1">dl.head = newNode
+                dl.tail = newNode
+</span>        } else {
+                <span class="cov8" title="1">dl.tail.Next = newNode
+                newNode.Prev = dl.tail
+                dl.tail = newNode
+</span>        }
+}
+
+// PopBack удаляет последний элемент.
+func (dl *Dlist) PopBack() {
+        <span class="cov8" title="1">if dl.IsEmptyList() </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">dl.tail = dl.tail.Prev
+        if dl.tail == nil </span>{
+                // узел был единственным, список опустел
+                <span class="cov8" title="1">dl.head = nil
+</span>        } else {
+                <span class="cov8" title="1">dl.tail.Next = nil
+</span>        }
+}
+
+// PushFront добавляет элемент в начало.
+func (dl *Dlist) PushFront(name string) {
+        <span class="cov8" title="1">newNode := &amp;DNode{Person: name}
+</span>
+        <span class="cov8" title="1">if dl.IsEmptyList() </span>{
+                <span class="cov8" title="1">dl.head = newNode
+                dl.tail = newNode
+</span>        } else {
+                <span class="cov8" title="1">dl.head.Prev = newNode
+                newNode.Next = dl.head
+                dl.head = newNode
+</span>        }
+}
+
+// PopFront удаляет первый элемент.
+func (dl *Dlist) PopFront() {
+        <span class="cov8" title="1">if dl.IsEmptyList() </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">dl.head = dl.head.Next
+        if dl.head == nil </span>{
+                // узел был единственным, список опустел
+                <span class="cov8" title="1">dl.tail = nil
+</span>        } else {
+                <span class="cov8" title="1">dl.head.Prev = nil
+</span>        }
+}
+
+// PushBetween вставляет элемент после узла node.
+func (dl *Dlist) PushBetween(node *DNode, name string) {
+        <span class="cov8" title="1">if node == nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">newNode := &amp;DNode{Person: name, Next: node.Next, Prev: node}
+        if node.Next != nil </span>{
+                <span class="cov8" title="1">node.Next.Prev = newNode
+</span>        } else {
+                <span class="cov8" title="1">dl.tail = newNode
+</span>        }
+        <span class="cov8" title="1">node.Next = newNode</span>
+}
+
+// PushBefore вставляет элемент перед узлом node.
+func (dl *Dlist) PushBefore(node *DNode, name string) {
+        <span class="cov8" title="1">if node == nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">if node.Prev == nil </span>{
+                <span class="cov8" title="1">dl.PushFront(name)
+</span>        } else {
+                <span class="cov8" title="1">dl.PushBetween(node.Prev, name)
+</span>        }
+}
+
+// PopAfter удаляет элемент после узла node.
+func (dl *Dlist) PopAfter(node *DNode) {
+        <span class="cov8" title="1">if node == nil || node.Next == nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">tmp := node.Next
+        if tmp.Next == nil </span>{
+                // удаляем хвост
+                <span class="cov8" title="1">node.Next = nil
+                dl.tail = node
+                return
+</span>        }
+
+        <span class="cov8" title="1">node.Next = tmp.Next
+        tmp.Next.Prev = node</span>
+}
+
+// PopBefore удаляет элемент перед узлом node.
+func (dl *Dlist) PopBefore(node *DNode) {
+        <span class="cov8" title="1">if node == nil || node.Prev == nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">tmp := node.Prev
+        if tmp.Prev == nil </span>{
+                // удаляем голову
+                <span class="cov8" title="1">node.Prev = nil
+                dl.head = node
+                return
+</span>        }
+
+        <span class="cov8" title="1">tmp.Prev.Next = node
+        node.Prev = tmp.Prev</span>
+}
+
+// PrintForward печатает список от головы к хвосту.
+func (dl *Dlist) PrintForward() {
+        <span class="cov8" title="1">for current := dl.head; current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">fmt.Print(current.Person, " &lt;-&gt; ")
+</span>        }
+        <span class="cov8" title="1">fmt.Println("nil")</span>
+}
+
+// PrintBackward печатает список от хвоста к голове.
+func (dl *Dlist) PrintBackward() {
+        <span class="cov8" title="1">for current := dl.tail; current != nil; current = current.Prev </span>{
+                <span class="cov8" title="1">fmt.Print(current.Person, " &lt;-&gt; ")
+</span>        }
+        <span class="cov8" title="1">fmt.Println("nil")</span>
+}
+
+// FindName ищет узел со значением name, если не нашел - возвращает nil.
+func (dl *Dlist) FindName(name string) *DNode {
+        <span class="cov8" title="1">for current := dl.head; current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">if current.Person == name </span>{
+                        <span class="cov8" title="1">return current
+</span>                }
+        }
+        <span class="cov8" title="1">return nil</span>
+}
+
+// PopName удаляет первый элемент со значением name.
+func (dl *Dlist) PopName(name string) {
+        <span class="cov8" title="1">node := dl.FindName(name)
+        if node == nil </span>{
+                <span class="cov8" title="1">fmt.Println("нет такого элемента")
+                return
+</span>        }
+
+        <span class="cov8" title="1">if node == dl.head </span>{
+                <span class="cov8" title="1">dl.PopFront()
+</span>        } else {
+                <span class="cov8" title="1">dl.PopAfter(node.Prev)
+</span>        }
+}
+
+// GetHead возвращает первый узел списка.
+func (dl *Dlist) GetHead() *DNode {
+        <span class="cov8" title="1">return dl.head
+</span>}
+
+// HandleDlist выполняет команду над двусвязным списком с именем name.
+func HandleDlist(command Command, db DB, name string, ss io.Reader) {
+        <span class="cov8" title="1">if WrongType(db, name, "dlist") </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">dl := NewDlist()
+        for _, item := range loadStrings(db, name) </span>{
+                <span class="cov8" title="1">dl.PushBack(item)
+</span>        }
+
+        <span class="cov8" title="1">var target, value string
+        var node *DNode
+        switch command </span>{
+        case LPUSHH:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                dl.PushFront(value)</span>
+        case LPUSHT:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                dl.PushBack(value)</span>
+        case LPUSHA:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;target, &amp;value)
+                node = dl.FindName(target)
+                if node == nil </span>{
+                        <span class="cov8" title="1">fmt.Println("нет такого элемента")
+</span>                } else {
+                        <span class="cov8" title="1">dl.PushBetween(node, value)
+</span>                }
+        case LPUSHB:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;target, &amp;value)
+                node = dl.FindName(target)
+                if node == nil </span>{
+                        <span class="cov8" title="1">fmt.Println("нет такого элемента")
+</span>                } else {
+                        <span class="cov8" title="1">dl.PushBefore(node, value)
+</span>                }
+        case LDELH:
+                <span class="cov8" title="1">dl.PopFront()</span>
+        case LDELT:
+                <span class="cov8" title="1">dl.PopBack()</span>
+        case LDELA:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;target)
+                node = dl.FindName(target)
+                if node == nil </span>{
+                        <span class="cov8" title="1">fmt.Println("нет такого элемента")
+</span>                } else {
+                        <span class="cov8" title="1">dl.PopAfter(node)
+</span>                }
+        case LDELB:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;target)
+                node = dl.FindName(target)
+                if node == nil </span>{
+                        <span class="cov8" title="1">fmt.Println("нет такого элемента")
+</span>                } else {
+                        <span class="cov8" title="1">dl.PopBefore(node)
+</span>                }
+        case LDEL:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                dl.PopName(value)</span>
+        case LFIND:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                if dl.FindName(value) != nil </span>{
+                        <span class="cov8" title="1">fmt.Println("-&gt; TRUE")
+</span>                } else {
+                        <span class="cov8" title="1">fmt.Println("-&gt; FALSE")
+</span>                }
+        case LPRINT:
+                <span class="cov8" title="1">dl.PrintForward()</span>
+        case LPRINTR:
+                <span class="cov8" title="1">dl.PrintBackward()</span>
+        }
+
+        <span class="cov8" title="1">items := []string{}
+        for current := dl.GetHead(); current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">items = append(items, current.Person)
+</span>        }
+        <span class="cov8" title="1">saveStrings(db, name, "dlist", items)</span>
+}
+
+// SaveBinary сохраняет список в бинарный файл:
+// количество элементов, затем строки от головы к хвосту.
+func (dl *Dlist) SaveBinary(fileName string) {
+        <span class="cov8" title="1">out, err := os.Create(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer out.Close()
+</span>
+        <span class="cov8" title="1">count := 0
+        for current := dl.head; current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">count++
+</span>        }
+
+        <span class="cov8" title="1">writeInt(out, count)
+        for current := dl.head; current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">writeString(out, current.Person)
+</span>        }
+}
+
+// LoadBinary загружает список из бинарного файла.
+// Старые элементы перед загрузкой удаляются.
+func (dl *Dlist) LoadBinary(fileName string) {
+        <span class="cov8" title="1">in, err := os.Open(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer in.Close()
+</span>
+        <span class="cov8" title="1">dl.head = nil
+        dl.tail = nil
+        count := readInt(in)
+        for i := 0; i &lt; count; i++ </span>{
+                <span class="cov8" title="1">dl.PushBack(readString(in))
+</span>        }
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package structures
+
+import (
+        "fmt"
+        "io"
+        "os"
+)
+
+// FNode - узел односвязного списка.
+type FNode struct {
+        Value string
+        Next  *FNode
+}
+
+// Flist - односвязный список.
+type Flist struct {
+        head *FNode
+}
+
+// NewFlist создает пустой список.
+func NewFlist() *Flist {
+        <span class="cov8" title="1">return &amp;Flist{}
+</span>}
+
+// IsEmptyList проверяет, пуст ли список.
+func (fl *Flist) IsEmptyList() bool {
+        <span class="cov8" title="1">return fl.head == nil
+</span>}
+
+// PushFront добавляет элемент в начало.
+func (fl *Flist) PushFront(a string) {
+        <span class="cov8" title="1">fl.head = &amp;FNode{Value: a, Next: fl.head}
+</span>}
+
+// PopFront удаляет первый элемент.
+func (fl *Flist) PopFront() {
+        <span class="cov8" title="1">if fl.IsEmptyList() </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">fl.head = fl.head.Next</span>
+}
+
+// AddOne вставляет элемент после узла first.
+func (fl *Flist) AddOne(first *FNode, a string) {
+        <span class="cov8" title="1">if first == nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">first.Next = &amp;FNode{Value: a, Next: first.Next}</span>
+}
+
+// DeleteNode удаляет элемент после узла abc.
+func (fl *Flist) DeleteNode(abc *FNode) {
+        <span class="cov8" title="1">if abc == nil || abc.Next == nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">abc.Next = abc.Next.Next</span>
+}
+
+// AddTail добавляет элемент в конец.
+// Хвоста у списка нет, поэтому идем до конца от головы.
+func (fl *Flist) AddTail(value string) {
+        <span class="cov8" title="1">newNode := &amp;FNode{Value: value}
+</span>
+        <span class="cov8" title="1">if fl.IsEmptyList() </span>{
+                <span class="cov8" title="1">fl.head = newNode
+                return
+</span>        }
+
+        <span class="cov8" title="1">tmp := fl.head
+        for tmp.Next != nil </span>{
+                <span class="cov8" title="1">tmp = tmp.Next
+</span>        }
+        <span class="cov8" title="1">tmp.Next = newNode</span>
+}
+
+// PopTail удаляет последний элемент.
+func (fl *Flist) PopTail() {
+        <span class="cov8" title="1">if fl.IsEmptyList() </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">if fl.head.Next == nil </span>{
+                <span class="cov8" title="1">fl.head = nil
+                return
+</span>        }
+
+        <span class="cov8" title="1">tmp := fl.head
+        for tmp.Next.Next != nil </span>{
+                <span class="cov8" title="1">tmp = tmp.Next
+</span>        }
+        <span class="cov8" title="1">tmp.Next = nil</span>
+}
+
+// AddBefore вставляет элемент перед узлом target.
+func (fl *Flist) AddBefore(target *FNode, a string) {
+        <span class="cov8" title="1">if target == nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">if target == fl.head </span>{
+                <span class="cov8" title="1">fl.PushFront(a)
+                return
+</span>        }
+
+        <span class="cov8" title="1">p := fl.head
+        for p.Next != target </span>{
+                <span class="cov8" title="1">p = p.Next
+</span>        }
+        <span class="cov8" title="1">fl.AddOne(p, a)</span>
+}
+
+// DeleteBefore удаляет элемент перед узлом target.
+func (fl *Flist) DeleteBefore(target *FNode) {
+        <span class="cov8" title="1">if fl.IsEmptyList() || target == nil || target == fl.head </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">if fl.head.Next == target </span>{
+                <span class="cov8" title="1">fl.PopFront()
+                return
+</span>        }
+
+        <span class="cov8" title="1">p := fl.head
+        for p.Next.Next != target </span>{
+                <span class="cov8" title="1">p = p.Next
+</span>        }
+        <span class="cov8" title="1">fl.DeleteNode(p)</span>
+}
+
+// FindValue ищет узел со значением a, если не нашел - возвращает nil.
+func (fl *Flist) FindValue(a string) *FNode {
+        <span class="cov8" title="1">for current := fl.head; current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">if current.Value == a </span>{
+                        <span class="cov8" title="1">return current
+</span>                }
+        }
+        <span class="cov8" title="1">return nil</span>
+}
+
+// DeleteValue удаляет первый элемент со значением a.
+func (fl *Flist) DeleteValue(a string) {
+        <span class="cov8" title="1">if fl.IsEmptyList() </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">if fl.head.Value == a </span>{
+                <span class="cov8" title="1">fl.PopFront()
+                return
+</span>        }
+
+        <span class="cov8" title="1">p := fl.head
+        for p.Next != nil &amp;&amp; p.Next.Value != a </span>{
+                <span class="cov0" title="0">p = p.Next
+</span>        }
+
+        <span class="cov8" title="1">if p.Next != nil </span>{
+                <span class="cov8" title="1">fl.DeleteNode(p)
+</span>        }
+}
+
+// printReverseFrom рекурсивно печатает список с конца, начиная с node.
+func (fl *Flist) printReverseFrom(node *FNode) {
+        <span class="cov8" title="1">if node == nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">fl.printReverseFrom(node.Next)
+        fmt.Print(node.Value, " ")</span>
+}
+
+// PrintReverse печатает список с конца.
+func (fl *Flist) PrintReverse() {
+        <span class="cov8" title="1">fl.printReverseFrom(fl.head)
+        fmt.Println()
+</span>}
+
+// PrintList печатает список с начала.
+func (fl *Flist) PrintList() {
+        <span class="cov8" title="1">for p := fl.head; p != nil; p = p.Next </span>{
+                <span class="cov8" title="1">fmt.Print(p.Value, " -&gt; ")
+</span>        }
+        <span class="cov8" title="1">fmt.Println("nil")</span>
+}
+
+// GetHead возвращает первый узел списка.
+func (fl *Flist) GetHead() *FNode {
+        <span class="cov8" title="1">return fl.head
+</span>}
+
+// HandleFlist выполняет команду над односвязным списком с именем name.
+func HandleFlist(command Command, db DB, name string, ss io.Reader) {
+        <span class="cov8" title="1">if WrongType(db, name, "flist") </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">fl := NewFlist()
+        for _, item := range loadStrings(db, name) </span>{
+                <span class="cov8" title="1">fl.AddTail(item)
+</span>        }
+
+        <span class="cov8" title="1">var target, value string
+        var node *FNode
+        switch command </span>{
+        case FPUSHH:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                fl.PushFront(value)</span>
+        case FPUSHT:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                fl.AddTail(value)</span>
+        case FPUSHA:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;target, &amp;value)
+                node = fl.FindValue(target)
+                if node == nil </span>{
+                        <span class="cov8" title="1">fmt.Println("нет такого элемента")
+</span>                } else {
+                        <span class="cov8" title="1">fl.AddOne(node, value)
+</span>                }
+        case FPUSHB:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;target, &amp;value)
+                node = fl.FindValue(target)
+                if node == nil </span>{
+                        <span class="cov8" title="1">fmt.Println("нет такого элемента")
+</span>                } else {
+                        <span class="cov8" title="1">fl.AddBefore(node, value)
+</span>                }
+        case FDELH:
+                <span class="cov8" title="1">fl.PopFront()</span>
+        case FDELT:
+                <span class="cov8" title="1">fl.PopTail()</span>
+        case FDELA:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;target)
+                node = fl.FindValue(target)
+                if node == nil </span>{
+                        <span class="cov8" title="1">fmt.Println("нет такого элемента")
+</span>                } else {
+                        <span class="cov8" title="1">fl.DeleteNode(node)
+</span>                }
+        case FDELB:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;target)
+                node = fl.FindValue(target)
+                if node == nil </span>{
+                        <span class="cov8" title="1">fmt.Println("нет такого элемента")
+</span>                } else {
+                        <span class="cov8" title="1">fl.DeleteBefore(node)
+</span>                }
+        case FDEL:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                fl.DeleteValue(value)</span>
+        case FFIND:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                if fl.FindValue(value) != nil </span>{
+                        <span class="cov8" title="1">fmt.Println("-&gt; TRUE")
+</span>                } else {
+                        <span class="cov8" title="1">fmt.Println("-&gt; FALSE")
+</span>                }
+        case FPRINT:
+                <span class="cov8" title="1">fl.PrintList()</span>
+        case FPRINTR:
+                <span class="cov8" title="1">fl.PrintReverse()</span>
+        }
+
+        <span class="cov8" title="1">items := []string{}
+        for current := fl.GetHead(); current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">items = append(items, current.Value)
+</span>        }
+        <span class="cov8" title="1">saveStrings(db, name, "flist", items)</span>
+}
+
+// SaveBinary сохраняет список в бинарный файл:
+// количество элементов, затем строки от головы к хвосту.
+func (fl *Flist) SaveBinary(fileName string) {
+        <span class="cov8" title="1">out, err := os.Create(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer out.Close()
+</span>
+        <span class="cov8" title="1">count := 0
+        for current := fl.head; current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">count++
+</span>        }
+
+        <span class="cov8" title="1">writeInt(out, count)
+        for current := fl.head; current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">writeString(out, current.Value)
+</span>        }
+}
+
+// LoadBinary загружает список из бинарного файла.
+// Старые элементы перед загрузкой удаляются.
+func (fl *Flist) LoadBinary(fileName string) {
+        <span class="cov8" title="1">in, err := os.Open(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer in.Close()
+</span>
+        <span class="cov8" title="1">fl.head = nil
+        count := readInt(in)
+        for i := 0; i &lt; count; i++ </span>{
+                <span class="cov8" title="1">fl.AddTail(readString(in))
+</span>        }
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package structures
+
+import (
+        "fmt"
+        "io"
+        "os"
+        "strconv"
+)
+
+// foldSum - хеш методом свертки: число режется на куски по 3 цифры,
+// куски складываются.
+func foldSum(key int) int {
+        <span class="cov8" title="1">if key &lt; 0 </span>{
+                <span class="cov8" title="1">key = -key
+</span>        }
+        <span class="cov8" title="1">s := strconv.Itoa(key)
+        sum := 0
+        for i := 0; i &lt; len(s); i += 3 </span>{
+                <span class="cov8" title="1">end := i + 3
+                if end &gt; len(s) </span>{
+                        <span class="cov8" title="1">end = len(s)
+</span>                }
+                <span class="cov8" title="1">part, _ := strconv.Atoi(s[i:end])
+                sum += part</span>
+        }
+        <span class="cov8" title="1">return sum</span>
+}
+
+const hashSize = 100
+
+// Node - узел цепочки в хеш-таблице.
+type Node struct {
+        Value int
+        Next  *Node
+}
+
+// HashTable - хеш-таблица с цепочками.
+type HashTable struct {
+        table [hashSize]*Node
+}
+
+// NewHashTable создает пустую таблицу.
+func NewHashTable() *HashTable {
+        <span class="cov8" title="1">return &amp;HashTable{}
+</span>}
+
+func (ht *HashTable) hashKey(key int) int {
+        <span class="cov8" title="1">return foldSum(key) % hashSize
+</span>}
+
+// Search проверяет, есть ли ключ в таблице.
+func (ht *HashTable) Search(key int) bool {
+        <span class="cov8" title="1">for current := ht.table[ht.hashKey(key)]; current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">if current.Value == key </span>{
+                        <span class="cov8" title="1">return true
+</span>                }
+        }
+        <span class="cov8" title="1">return false</span>
+}
+
+// Add добавляет ключ в начало цепочки своей ячейки. Повторы не добавляются.
+func (ht *HashTable) Add(key int) {
+        <span class="cov8" title="1">if ht.Search(key) </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">index := ht.hashKey(key)
+        ht.table[index] = &amp;Node{Value: key, Next: ht.table[index]}</span>
+}
+
+// Remove удаляет ключ из таблицы.
+func (ht *HashTable) Remove(key int) {
+        <span class="cov8" title="1">index := ht.hashKey(key)
+</span>
+        <span class="cov8" title="1">var prev *Node
+        for current := ht.table[index]; current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">if current.Value == key </span>{
+                        <span class="cov8" title="1">if prev == nil </span>{
+                                <span class="cov8" title="1">ht.table[index] = current.Next
+</span>                        } else {
+                                <span class="cov8" title="1">prev.Next = current.Next
+</span>                        }
+                        <span class="cov8" title="1">return</span>
+                }
+                <span class="cov8" title="1">prev = current</span>
+        }
+}
+
+// Print печатает непустые ячейки с их цепочками.
+func (ht *HashTable) Print() {
+        <span class="cov8" title="1">for i := 0; i &lt; hashSize; i++ </span>{
+                <span class="cov8" title="1">if ht.table[i] == nil </span>{
+                        <span class="cov8" title="1">continue</span>
+                }
+                <span class="cov8" title="1">fmt.Print(i, ": ")
+                for current := ht.table[i]; current != nil; current = current.Next </span>{
+                        <span class="cov8" title="1">fmt.Print(current.Value, " -&gt; ")
+</span>                }
+                <span class="cov8" title="1">fmt.Println("nil")</span>
+        }
+}
+
+// GetAll возвращает все ключи таблицы.
+func (ht *HashTable) GetAll() []int {
+        <span class="cov8" title="1">result := []int{}
+        for i := 0; i &lt; hashSize; i++ </span>{
+                <span class="cov8" title="1">for current := ht.table[i]; current != nil; current = current.Next </span>{
+                        <span class="cov8" title="1">result = append(result, current.Value)
+</span>                }
+        }
+        <span class="cov8" title="1">return result</span>
+}
+
+const maxTempt = 50
+
+// Kukushka - хеш-таблица кукушки: две таблицы и две хеш-функции.
+type Kukushka struct {
+        size  int
+        t1    []int
+        t2    []int
+        used1 []bool
+        used2 []bool
+}
+
+// NewKukushka создает пустую таблицу на 11 ячеек.
+func NewKukushka() *Kukushka {
+        <span class="cov8" title="1">size := 11
+        return &amp;Kukushka{
+                size:  size,
+                t1:    make([]int, size),
+                t2:    make([]int, size),
+                used1: make([]bool, size),
+                used2: make([]bool, size),
+</span>        }
+}
+
+func (k *Kukushka) hash1(key int) int {
+        <span class="cov8" title="1">return foldSum(key) % k.size
+</span>}
+
+func (k *Kukushka) hash2(key int) int {
+        <span class="cov8" title="1">h := key % k.size
+        if h &lt; 0 </span>{
+                <span class="cov0" title="0">h += k.size
+</span>        }
+        <span class="cov8" title="1">return h</span>
+}
+
+// moreplace увеличивает таблицы в два раза и заново вставляет все ключи.
+func (k *Kukushka) moreplace() {
+        <span class="cov8" title="1">oldSize := k.size
+        old1, old2 := k.t1, k.t2
+        oldUsed1, oldUsed2 := k.used1, k.used2
+</span>
+        <span class="cov8" title="1">k.size *= 2
+        k.t1 = make([]int, k.size)
+        k.t2 = make([]int, k.size)
+        k.used1 = make([]bool, k.size)
+        k.used2 = make([]bool, k.size)
+</span>
+        <span class="cov8" title="1">for i := 0; i &lt; oldSize; i++ </span>{
+                <span class="cov8" title="1">if oldUsed1[i] </span>{
+                        <span class="cov8" title="1">k.Insert(old1[i])
+</span>                }
+                <span class="cov8" title="1">if oldUsed2[i] </span>{
+                        <span class="cov8" title="1">k.Insert(old2[i])
+</span>                }
+        }
+}
+
+// Search проверяет, есть ли ключ в одной из двух таблиц.
+func (k *Kukushka) Search(key int) bool {
+        <span class="cov8" title="1">i1 := k.hash1(key)
+        if k.used1[i1] &amp;&amp; k.t1[i1] == key </span>{
+                <span class="cov8" title="1">return true
+</span>        }
+        <span class="cov8" title="1">i2 := k.hash2(key)
+        return k.used2[i2] &amp;&amp; k.t2[i2] == key</span>
+}
+
+// Insert вставляет ключ. Если место занято, старый ключ выталкивается
+// в другую таблицу. Если вытеснения идут по кругу, таблицы расширяются.
+func (k *Kukushka) Insert(key int) {
+        <span class="cov8" title="1">if k.Search(key) </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">cur := key
+        for tempt := 0; tempt &lt; maxTempt; tempt++ </span>{
+                <span class="cov8" title="1">i1 := k.hash1(cur)
+                if !k.used1[i1] </span>{
+                        <span class="cov8" title="1">k.t1[i1] = cur
+                        k.used1[i1] = true
+                        return
+</span>                }
+                <span class="cov8" title="1">k.t1[i1], cur = cur, k.t1[i1]
+</span>
+                <span class="cov8" title="1">i2 := k.hash2(cur)
+                if !k.used2[i2] </span>{
+                        <span class="cov8" title="1">k.t2[i2] = cur
+                        k.used2[i2] = true
+                        return
+</span>                }
+                <span class="cov8" title="1">k.t2[i2], cur = cur, k.t2[i2]</span>
+        }
+        <span class="cov8" title="1">k.moreplace()
+        k.Insert(cur)</span>
+}
+
+// Remove удаляет ключ из таблицы.
+func (k *Kukushka) Remove(key int) {
+        <span class="cov8" title="1">i1 := k.hash1(key)
+        if k.used1[i1] &amp;&amp; k.t1[i1] == key </span>{
+                <span class="cov8" title="1">k.used1[i1] = false
+                return
+</span>        }
+        <span class="cov8" title="1">i2 := k.hash2(key)
+        if k.used2[i2] &amp;&amp; k.t2[i2] == key </span>{
+                <span class="cov8" title="1">k.used2[i2] = false
+</span>        }
+}
+
+// Print печатает занятые ячейки обеих таблиц.
+func (k *Kukushka) Print() {
+        <span class="cov8" title="1">fmt.Print("t1: ")
+        for i := 0; i &lt; k.size; i++ </span>{
+                <span class="cov8" title="1">if k.used1[i] </span>{
+                        <span class="cov8" title="1">fmt.Printf("[%d]=%d ", i, k.t1[i])
+</span>                }
+        }
+        <span class="cov8" title="1">fmt.Print("\nt2: ")
+        for i := 0; i &lt; k.size; i++ </span>{
+                <span class="cov8" title="1">if k.used2[i] </span>{
+                        <span class="cov8" title="1">fmt.Printf("[%d]=%d ", i, k.t2[i])
+</span>                }
+        }
+        <span class="cov8" title="1">fmt.Println()</span>
+}
+
+// GetAll возвращает все ключи из обеих таблиц.
+func (k *Kukushka) GetAll() []int {
+        <span class="cov8" title="1">result := []int{}
+        for i := 0; i &lt; k.size; i++ </span>{
+                <span class="cov8" title="1">if k.used1[i] </span>{
+                        <span class="cov8" title="1">result = append(result, k.t1[i])
+</span>                }
+        }
+        <span class="cov8" title="1">for i := 0; i &lt; k.size; i++ </span>{
+                <span class="cov8" title="1">if k.used2[i] </span>{
+                        <span class="cov8" title="1">result = append(result, k.t2[i])
+</span>                }
+        }
+        <span class="cov8" title="1">return result</span>
+}
+
+// HandleHash выполняет команду над таблицей с цепочками с именем name.
+func HandleHash(command Command, db DB, name string, ss io.Reader) {
+        <span class="cov8" title="1">if WrongType(db, name, "hash") </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">ht := NewHashTable()
+        for _, key := range loadInts(db, name) </span>{
+                <span class="cov8" title="1">ht.Add(key)
+</span>        }
+
+        <span class="cov8" title="1">var value int
+        switch command </span>{
+        case HADD:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                ht.Add(value)
+                fmt.Println("-&gt;", value)</span>
+        case HDEL:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                ht.Remove(value)</span>
+        case HFIND:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                if ht.Search(value) </span>{
+                        <span class="cov8" title="1">fmt.Println("-&gt; TRUE")
+</span>                } else {
+                        <span class="cov8" title="1">fmt.Println("-&gt; FALSE")
+</span>                }
+        case HPRINT:
+                <span class="cov8" title="1">ht.Print()</span>
+        }
+
+        <span class="cov8" title="1">saveInts(db, name, "hash", ht.GetAll())</span>
+}
+
+// HandleKukushka выполняет команду над таблицей кукушки с именем name.
+func HandleKukushka(command Command, db DB, name string, ss io.Reader) {
+        <span class="cov8" title="1">if WrongType(db, name, "kukushka") </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">kt := NewKukushka()
+        for _, key := range loadInts(db, name) </span>{
+                <span class="cov8" title="1">kt.Insert(key)
+</span>        }
+
+        <span class="cov8" title="1">var value int
+        switch command </span>{
+        case KADD:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                kt.Insert(value)
+                fmt.Println("-&gt;", value)</span>
+        case KDEL:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                kt.Remove(value)</span>
+        case KFIND:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                if kt.Search(value) </span>{
+                        <span class="cov8" title="1">fmt.Println("-&gt; TRUE")
+</span>                } else {
+                        <span class="cov8" title="1">fmt.Println("-&gt; FALSE")
+</span>                }
+        case KPRINT:
+                <span class="cov8" title="1">kt.Print()</span>
+        }
+
+        <span class="cov8" title="1">saveInts(db, name, "kukushka", kt.GetAll())</span>
+}
+
+// SaveBinary сохраняет таблицу в бинарный файл: количество ключей, затем ключи.
+// Номер ячейки хранить не нужно - при загрузке Add сам посчитает хеш.
+func (ht *HashTable) SaveBinary(fileName string) {
+        <span class="cov8" title="1">out, err := os.Create(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer out.Close()
+</span>
+        <span class="cov8" title="1">keys := ht.GetAll()
+        writeInt(out, len(keys))
+        for _, key := range keys </span>{
+                <span class="cov8" title="1">writeInt(out, key)
+</span>        }
+}
+
+// LoadBinary загружает таблицу из бинарного файла.
+// Старые ключи перед загрузкой удаляются.
+func (ht *HashTable) LoadBinary(fileName string) {
+        <span class="cov8" title="1">in, err := os.Open(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer in.Close()
+</span>
+        <span class="cov8" title="1">ht.table = [hashSize]*Node{}
+        count := readInt(in)
+        for i := 0; i &lt; count; i++ </span>{
+                <span class="cov8" title="1">ht.Add(readInt(in))
+</span>        }
+}
+
+// SaveBinary сохраняет таблицу кукушки так же: количество ключей, затем ключи.
+func (k *Kukushka) SaveBinary(fileName string) {
+        <span class="cov8" title="1">out, err := os.Create(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer out.Close()
+</span>
+        <span class="cov8" title="1">keys := k.GetAll()
+        writeInt(out, len(keys))
+        for _, key := range keys </span>{
+                <span class="cov8" title="1">writeInt(out, key)
+</span>        }
+}
+
+// LoadBinary загружает таблицу кукушки из бинарного файла.
+// Старые ключи перед загрузкой удаляются.
+func (k *Kukushka) LoadBinary(fileName string) {
+        <span class="cov8" title="1">in, err := os.Open(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer in.Close()
+</span>
+        <span class="cov8" title="1">*k = *NewKukushka()
+        count := readInt(in)
+        for i := 0; i &lt; count; i++ </span>{
+                <span class="cov8" title="1">k.Insert(readInt(in))
+</span>        }
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package structures
+
+import (
+        "fmt"
+        "io"
+        "os"
+)
+
+// QNode - узел очереди.
+type QNode struct {
+        A    string
+        Next *QNode
+}
+
+// Queue - очередь на односвязном списке: забираем из head, добавляем в tail.
+type Queue struct {
+        head *QNode
+        tail *QNode
+}
+
+// NewQueue создает пустую очередь.
+func NewQueue() *Queue {
+        <span class="cov8" title="1">return &amp;Queue{}
+</span>}
+
+// IsEmptyQ проверяет, пуста ли очередь.
+func (q *Queue) IsEmptyQ() bool {
+        <span class="cov8" title="1">return q.head == nil
+</span>}
+
+// Push добавляет элемент в конец очереди.
+func (q *Queue) Push(a string) {
+        <span class="cov8" title="1">newNode := &amp;QNode{A: a}
+</span>
+        <span class="cov8" title="1">if q.IsEmptyQ() </span>{
+                <span class="cov8" title="1">q.head = newNode
+                q.tail = newNode
+</span>        } else {
+                <span class="cov8" title="1">q.tail.Next = newNode
+                q.tail = newNode
+</span>        }
+}
+
+// Pop убирает первый элемент очереди.
+func (q *Queue) Pop() {
+        <span class="cov8" title="1">if q.IsEmptyQ() </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">q.head = q.head.Next
+        if q.IsEmptyQ() </span>{
+                <span class="cov8" title="1">q.tail = nil
+</span>        }
+}
+
+// Top возвращает первый элемент, для пустой очереди - пустую строку.
+func (q *Queue) Top() string {
+        <span class="cov8" title="1">if q.IsEmptyQ() </span>{
+                <span class="cov8" title="1">return ""
+</span>        }
+        <span class="cov8" title="1">return q.head.A</span>
+}
+
+// PrintQ печатает очередь от начала к концу.
+func (q *Queue) PrintQ() {
+        <span class="cov8" title="1">for current := q.head; current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">fmt.Print(current.A, " -&gt; ")
+</span>        }
+        <span class="cov8" title="1">fmt.Println("nil")</span>
+}
+
+// GetHead возвращает первый узел очереди.
+func (q *Queue) GetHead() *QNode {
+        <span class="cov8" title="1">return q.head
+</span>}
+
+// HandleQueue выполняет команду над очередью с именем name.
+func HandleQueue(command Command, db DB, name string, ss io.Reader) {
+        <span class="cov8" title="1">if WrongType(db, name, "queue") </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">q := NewQueue()
+        for _, item := range loadStrings(db, name) </span>{
+                <span class="cov8" title="1">q.Push(item)
+</span>        }
+
+        <span class="cov8" title="1">var value string
+        switch command </span>{
+        case QPUSH:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                q.Push(value)
+                fmt.Println("-&gt;", value)</span>
+        case QPOP:
+                <span class="cov8" title="1">if q.IsEmptyQ() </span>{
+                        <span class="cov8" title="1">fmt.Println("-&gt; очередь пуста")
+</span>                } else {
+                        <span class="cov8" title="1">fmt.Println("-&gt;", q.Top())
+                        q.Pop()
+</span>                }
+        case QPRINT:
+                <span class="cov8" title="1">q.PrintQ()</span>
+        }
+
+        <span class="cov8" title="1">items := []string{}
+        for current := q.GetHead(); current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">items = append(items, current.A)
+</span>        }
+        <span class="cov8" title="1">saveStrings(db, name, "queue", items)</span>
+}
+
+// SaveBinary сохраняет очередь в бинарный файл:
+// количество элементов, затем строки от начала к концу.
+func (q *Queue) SaveBinary(fileName string) {
+        <span class="cov8" title="1">out, err := os.Create(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer out.Close()
+</span>
+        <span class="cov8" title="1">count := 0
+        for current := q.head; current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">count++
+</span>        }
+
+        <span class="cov8" title="1">writeInt(out, count)
+        for current := q.head; current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">writeString(out, current.A)
+</span>        }
+}
+
+// LoadBinary загружает очередь из бинарного файла.
+// Старые элементы перед загрузкой удаляются.
+func (q *Queue) LoadBinary(fileName string) {
+        <span class="cov8" title="1">in, err := os.Open(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer in.Close()
+</span>
+        <span class="cov8" title="1">q.head = nil
+        q.tail = nil
+        count := readInt(in)
+        for i := 0; i &lt; count; i++ </span>{
+                <span class="cov8" title="1">q.Push(readString(in))
+</span>        }
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package structures
+
+import (
+        "encoding/binary"
+        "io"
+)
+
+// Общие функции для бинарной сериализации.
+// Число пишется как 4 байта, строка - как длина (число) и сами байты.
+
+func writeInt(out io.Writer, value int) {
+        <span class="cov8" title="1">_ = binary.Write(out, binary.LittleEndian, int32(value))
+</span>}
+
+func readInt(in io.Reader) int {
+        <span class="cov8" title="1">var value int32
+        _ = binary.Read(in, binary.LittleEndian, &amp;value)
+        return int(value)
+</span>}
+
+func writeString(out io.Writer, text string) {
+        <span class="cov8" title="1">writeInt(out, len(text))
+        _, _ = out.Write([]byte(text))
+</span>}
+
+func readString(in io.Reader) string {
+        <span class="cov8" title="1">length := readInt(in)
+        buffer := make([]byte, length)
+        _, _ = io.ReadFull(in, buffer)
+        return string(buffer)
+</span>}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package structures
+
+import (
+        "fmt"
+        "io"
+        "os"
+)
+
+// SNode - узел стека.
+type SNode struct {
+        A    string
+        Next *SNode
+}
+
+// Stack - стек на односвязном списке, head - вершина.
+type Stack struct {
+        head *SNode
+}
+
+// NewStack создает пустой стек.
+func NewStack() *Stack {
+        <span class="cov8" title="1">return &amp;Stack{}
+</span>}
+
+// IsEmptyStack проверяет, пуст ли стек.
+func (st *Stack) IsEmptyStack() bool {
+        <span class="cov8" title="1">return st.head == nil
+</span>}
+
+// Push кладет элемент на вершину.
+func (st *Stack) Push(a string) {
+        <span class="cov8" title="1">st.head = &amp;SNode{A: a, Next: st.head}
+</span>}
+
+// Pop снимает элемент с вершины.
+func (st *Stack) Pop() {
+        <span class="cov8" title="1">if st.IsEmptyStack() </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">st.head = st.head.Next</span>
+}
+
+// Top возвращает вершину, для пустого стека - пустую строку.
+func (st *Stack) Top() string {
+        <span class="cov8" title="1">if st.IsEmptyStack() </span>{
+                <span class="cov8" title="1">return ""
+</span>        }
+        <span class="cov8" title="1">return st.head.A</span>
+}
+
+// Print печатает стек от вершины вниз.
+func (st *Stack) Print() {
+        <span class="cov8" title="1">for current := st.head; current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">fmt.Print(current.A, " -&gt; ")
+</span>        }
+        <span class="cov8" title="1">fmt.Println("nil")</span>
+}
+
+// GetHead возвращает вершину стека.
+func (st *Stack) GetHead() *SNode {
+        <span class="cov8" title="1">return st.head
+</span>}
+
+// HandleStack выполняет команду над стеком с именем name.
+func HandleStack(command Command, db DB, name string, ss io.Reader) {
+        <span class="cov8" title="1">if WrongType(db, name, "stack") </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">stack := NewStack()
+        for _, item := range loadStrings(db, name) </span>{
+                <span class="cov8" title="1">stack.Push(item)
+</span>        }
+
+        <span class="cov8" title="1">var value string
+        switch command </span>{
+        case SPUSH:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                stack.Push(value)
+                fmt.Println("-&gt;", value)</span>
+        case SPOP:
+                <span class="cov8" title="1">if stack.IsEmptyStack() </span>{
+                        <span class="cov8" title="1">fmt.Println("-&gt; стек пуст")
+</span>                } else {
+                        <span class="cov8" title="1">fmt.Println("-&gt;", stack.Top())
+                        stack.Pop()
+</span>                }
+        case SPRINT:
+                <span class="cov8" title="1">stack.Print()</span>
+        }
+
+        // идем от вершины вниз и вставляем в начало,
+        // чтобы в json был порядок снизу вверх
+        <span class="cov8" title="1">items := []string{}
+        for current := stack.GetHead(); current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">items = append([]string{current.A}, items...)
+</span>        }
+        <span class="cov8" title="1">saveStrings(db, name, "stack", items)</span>
+}
+
+// SaveBinary сохраняет стек в бинарный файл:
+// количество элементов, затем строки снизу вверх.
+func (st *Stack) SaveBinary(fileName string) {
+        <span class="cov8" title="1">out, err := os.Create(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer out.Close()
+</span>
+        <span class="cov8" title="1">items := []string{}
+        for current := st.head; current != nil; current = current.Next </span>{
+                <span class="cov8" title="1">items = append(items, current.A)
+</span>        }
+
+        <span class="cov8" title="1">writeInt(out, len(items))
+        for i := len(items) - 1; i &gt;= 0; i-- </span>{
+                <span class="cov8" title="1">writeString(out, items[i])
+</span>        }
+}
+
+// LoadBinary загружает стек из бинарного файла.
+// Старые элементы перед загрузкой удаляются.
+func (st *Stack) LoadBinary(fileName string) {
+        <span class="cov8" title="1">in, err := os.Open(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer in.Close()
+</span>
+        <span class="cov8" title="1">st.head = nil
+        count := readInt(in)
+        for i := 0; i &lt; count; i++ </span>{
+                <span class="cov8" title="1">st.Push(readString(in))
+</span>        }
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package structures
+
+import (
+        "fmt"
+        "io"
+        "os"
+)
+
+// TreeNode - узел двоичного дерева поиска.
+type TreeNode struct {
+        Key   int
+        Left  *TreeNode
+        Right *TreeNode
+}
+
+// Tree - двоичное дерево поиска.
+type Tree struct {
+        root *TreeNode
+}
+
+// NewTree создает пустое дерево.
+func NewTree() *Tree {
+        <span class="cov8" title="1">return &amp;Tree{}
+</span>}
+
+// Insert вставляет ключ: меньшие уходят влево, остальные вправо.
+func (tr *Tree) Insert(key int) {
+        <span class="cov8" title="1">newNode := &amp;TreeNode{Key: key}
+        if tr.root == nil </span>{
+                <span class="cov8" title="1">tr.root = newNode
+                return
+</span>        }
+
+        <span class="cov8" title="1">var parent *TreeNode
+        current := tr.root
+        for current != nil </span>{
+                <span class="cov8" title="1">parent = current
+                if key &lt; current.Key </span>{
+                        <span class="cov8" title="1">current = current.Left
+</span>                } else {
+                        <span class="cov8" title="1">current = current.Right
+</span>                }
+        }
+
+        <span class="cov8" title="1">if key &lt; parent.Key </span>{
+                <span class="cov8" title="1">parent.Left = newNode
+</span>        } else {
+                <span class="cov8" title="1">parent.Right = newNode
+</span>        }
+}
+
+// Рекурсивные обходы. Им нужен узел, с которого начинать,
+// поэтому снаружи они вызываются через PrintPreorder и т.д.
+
+func (tr *Tree) preorder(node *TreeNode) {
+        <span class="cov8" title="1">if node == nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">fmt.Print(node.Key, " ")
+        tr.preorder(node.Left)
+        tr.preorder(node.Right)</span>
+}
+
+func (tr *Tree) inorder(node *TreeNode) {
+        <span class="cov8" title="1">if node == nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">tr.inorder(node.Left)
+        fmt.Print(node.Key, " ")
+        tr.inorder(node.Right)</span>
+}
+
+func (tr *Tree) postorder(node *TreeNode) {
+        <span class="cov8" title="1">if node == nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">tr.postorder(node.Left)
+        tr.postorder(node.Right)
+        fmt.Print(node.Key, " ")</span>
+}
+
+// PrintPreorder печатает прямой обход.
+func (tr *Tree) PrintPreorder() {
+        <span class="cov8" title="1">tr.preorder(tr.root)
+</span>}
+
+// PrintInorder печатает симметричный обход.
+func (tr *Tree) PrintInorder() {
+        <span class="cov8" title="1">tr.inorder(tr.root)
+</span>}
+
+// PrintPostorder печатает обратный обход.
+func (tr *Tree) PrintPostorder() {
+        <span class="cov8" title="1">tr.postorder(tr.root)
+</span>}
+
+// Bfs печатает обход в ширину.
+func (tr *Tree) Bfs() {
+        <span class="cov8" title="1">if tr.root == nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">ochered := []*TreeNode{tr.root}
+        for i := 0; i &lt; len(ochered); i++ </span>{
+                <span class="cov8" title="1">node := ochered[i]
+                fmt.Print(node.Key, " ")
+                if node.Left != nil </span>{
+                        <span class="cov8" title="1">ochered = append(ochered, node.Left)
+</span>                }
+                <span class="cov8" title="1">if node.Right != nil </span>{
+                        <span class="cov8" title="1">ochered = append(ochered, node.Right)
+</span>                }
+        }
+}
+
+// IsComplete проверяет, что дерево полное: при обходе в ширину
+// после первого пустого места не должно встречаться узлов.
+func (tr *Tree) IsComplete() bool {
+        <span class="cov8" title="1">if tr.root == nil </span>{
+                <span class="cov8" title="1">return true
+</span>        }
+
+        <span class="cov8" title="1">ochered := []*TreeNode{tr.root}
+        sawEmpty := false
+        for i := 0; i &lt; len(ochered); i++ </span>{
+                <span class="cov8" title="1">node := ochered[i]
+                if node == nil </span>{
+                        <span class="cov8" title="1">sawEmpty = true
+</span>                } else {
+                        <span class="cov8" title="1">if sawEmpty </span>{
+                                <span class="cov8" title="1">return false
+</span>                        }
+                        <span class="cov8" title="1">ochered = append(ochered, node.Left, node.Right)</span>
+                }
+        }
+        <span class="cov8" title="1">return true</span>
+}
+
+// Search ищет узел с ключом key, если не нашел - возвращает nil.
+func (tr *Tree) Search(key int) *TreeNode {
+        <span class="cov8" title="1">current := tr.root
+        for current != nil </span>{
+                <span class="cov8" title="1">if key == current.Key </span>{
+                        <span class="cov8" title="1">return current
+</span>                }
+                <span class="cov8" title="1">if key &lt; current.Key </span>{
+                        <span class="cov8" title="1">current = current.Left
+</span>                } else {
+                        <span class="cov8" title="1">current = current.Right
+</span>                }
+        }
+        <span class="cov8" title="1">return nil</span>
+}
+
+// GetRoot возвращает корень дерева.
+func (tr *Tree) GetRoot() *TreeNode {
+        <span class="cov8" title="1">return tr.root
+</span>}
+
+// bfsKeys возвращает ключи в порядке обхода в ширину.
+// Если вставить их в том же порядке, получится такое же дерево.
+func (tr *Tree) bfsKeys() []int {
+        <span class="cov8" title="1">keys := []int{}
+        if tr.root == nil </span>{
+                <span class="cov0" title="0">return keys
+</span>        }
+
+        <span class="cov8" title="1">ochered := []*TreeNode{tr.root}
+        for i := 0; i &lt; len(ochered); i++ </span>{
+                <span class="cov8" title="1">node := ochered[i]
+                keys = append(keys, node.Key)
+                if node.Left != nil </span>{
+                        <span class="cov8" title="1">ochered = append(ochered, node.Left)
+</span>                }
+                <span class="cov8" title="1">if node.Right != nil </span>{
+                        <span class="cov8" title="1">ochered = append(ochered, node.Right)
+</span>                }
+        }
+        <span class="cov8" title="1">return keys</span>
+}
+
+// HandleTree выполняет команду над деревом с именем name.
+func HandleTree(command Command, db DB, name string, ss io.Reader) {
+        <span class="cov8" title="1">if WrongType(db, name, "tree") </span>{
+                <span class="cov8" title="1">return
+</span>        }
+
+        <span class="cov8" title="1">tr := NewTree()
+        for _, key := range loadInts(db, name) </span>{
+                <span class="cov8" title="1">tr.Insert(key)
+</span>        }
+
+        <span class="cov8" title="1">var value int
+        switch command </span>{
+        case TINSERT:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                tr.Insert(value)
+                fmt.Println("-&gt;", value)</span>
+        case TFIND:
+                <span class="cov8" title="1">fmt.Fscan(ss, &amp;value)
+                if tr.Search(value) != nil </span>{
+                        <span class="cov8" title="1">fmt.Println("-&gt; TRUE")
+</span>                } else {
+                        <span class="cov8" title="1">fmt.Println("-&gt; FALSE")
+</span>                }
+        case TCOMPLETE:
+                <span class="cov8" title="1">if tr.IsComplete() </span>{
+                        <span class="cov8" title="1">fmt.Println("-&gt; TRUE")
+</span>                } else {
+                        <span class="cov8" title="1">fmt.Println("-&gt; FALSE")
+</span>                }
+        case TPRINT:
+                <span class="cov8" title="1">fmt.Print("прямой:       ")
+                tr.PrintPreorder()
+                fmt.Println()
+                fmt.Print("симметричный: ")
+                tr.PrintInorder()
+                fmt.Println()
+                fmt.Print("обратный:     ")
+                tr.PrintPostorder()
+                fmt.Println()
+                fmt.Print("в ширину:     ")
+                tr.Bfs()
+                fmt.Println()</span>
+        }
+
+        <span class="cov8" title="1">saveInts(db, name, "tree", tr.bfsKeys())</span>
+}
+
+// SaveBinary сохраняет дерево в бинарный файл:
+// количество ключей, затем ключи в порядке обхода в ширину.
+func (tr *Tree) SaveBinary(fileName string) {
+        <span class="cov8" title="1">out, err := os.Create(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer out.Close()
+</span>
+        <span class="cov8" title="1">keys := tr.bfsKeys()
+        writeInt(out, len(keys))
+        for _, key := range keys </span>{
+                <span class="cov8" title="1">writeInt(out, key)
+</span>        }
+}
+
+// LoadBinary загружает дерево из бинарного файла.
+// Старые ключи перед загрузкой удаляются.
+func (tr *Tree) LoadBinary(fileName string) {
+        <span class="cov8" title="1">in, err := os.Open(fileName)
+        if err != nil </span>{
+                <span class="cov8" title="1">return
+</span>        }
+        <span class="cov8" title="1">defer in.Close()
+</span>
+        <span class="cov8" title="1">tr.root = nil
+        count := readInt(in)
+        for i := 0; i &lt; count; i++ </span>{
+                <span class="cov8" title="1">tr.Insert(readInt(in))
+</span>        }
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
