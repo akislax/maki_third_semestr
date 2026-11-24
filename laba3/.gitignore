@@ -1,0 +1,7 @@
+coverage/
+
+*.gcda
+*.gcno
+*.info
+
+go/coverage.html
