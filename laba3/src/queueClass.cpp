@@ -76,12 +76,15 @@ void handleQueue(Command command, json& db, const string& name, stringstream& ss
     if (wrongType(db, name, "queue")) return;
 
     Queue q;
+    if (binaryMode) q.loadBinary(binaryFile(name));
+    else {
     if (db.contains(name))
     {
         for (auto& element : db[name]["data"])
         {
             q.push(element.get<string>());
         }
+    }
     }
 
     string value;
@@ -107,6 +110,8 @@ void handleQueue(Command command, json& db, const string& name, stringstream& ss
             break;
     }
 
+        if (binaryMode) { db[name]["type"] = "queue"; q.saveBinary(binaryFile(name)); }
+    else {
     json data = json::array();
     for (QNode* current = q.getHead(); current != nullptr; current = current -> next)
     {
@@ -114,6 +119,7 @@ void handleQueue(Command command, json& db, const string& name, stringstream& ss
     }
     db[name]["type"] = "queue";
     db[name]["data"] = data;
+    }
 }
 
 // сериализация: [количество] [строки от головы к хвосту]

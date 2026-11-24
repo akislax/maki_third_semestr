@@ -68,8 +68,12 @@ func HandleStack(command Command, db DB, name string, ss io.Reader) {
 	}
 
 	stack := NewStack()
-	for _, item := range loadStrings(db, name) {
-		stack.Push(item)
+	if binaryMode {
+		stack.LoadBinary(binaryFile(name))
+	} else {
+		for _, item := range loadStrings(db, name) {
+			stack.Push(item)
+		}
 	}
 
 	var value string
@@ -91,11 +95,16 @@ func HandleStack(command Command, db DB, name string, ss io.Reader) {
 
 	// идем от вершины вниз и вставляем в начало,
 	// чтобы в json был порядок снизу вверх
-	items := []string{}
-	for current := stack.GetHead(); current != nil; current = current.Next {
-		items = append([]string{current.A}, items...)
+	if binaryMode {
+		db[name] = &Entry{Type: "stack"}
+		stack.SaveBinary(binaryFile(name))
+	} else {
+		items := []string{}
+		for current := stack.GetHead(); current != nil; current = current.Next {
+			items = append([]string{current.A}, items...)
+		}
+		saveStrings(db, name, "stack", items)
 	}
-	saveStrings(db, name, "stack", items)
 }
 
 // SaveBinary сохраняет стек в бинарный файл:

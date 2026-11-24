@@ -59,12 +59,15 @@ void handleStack(Command command, json& db, const string& name, stringstream& ss
     if (wrongType(db, name, "stack")) return;
 
     Stack stack;
+    if (binaryMode) stack.loadBinary(binaryFile(name));
+    else {
     if (db.contains(name))
     {
         for (auto& element : db[name]["data"])
         {
             stack.push(element.get<string>());
         }
+    }
     }
 
     string value;
@@ -91,6 +94,8 @@ void handleStack(Command command, json& db, const string& name, stringstream& ss
     }
 
     // идем от вершины вниз и вставляем в начало, чтобы в json был порядок "снизу вверх"
+        if (binaryMode) { db[name]["type"] = "stack"; stack.saveBinary(binaryFile(name)); }
+    else {
     json data = json::array();
     for (SNode* current = stack.getHead(); current != nullptr; current = current -> next)
     {
@@ -98,6 +103,7 @@ void handleStack(Command command, json& db, const string& name, stringstream& ss
     }
     db[name]["type"] = "stack";
     db[name]["data"] = data;
+    }
 }
 
 // сериализация: [количество] [строки снизу вверх]

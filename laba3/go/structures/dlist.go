@@ -204,8 +204,12 @@ func HandleDlist(command Command, db DB, name string, ss io.Reader) {
 	}
 
 	dl := NewDlist()
-	for _, item := range loadStrings(db, name) {
-		dl.PushBack(item)
+	if binaryMode {
+		dl.LoadBinary(binaryFile(name))
+	} else {
+		for _, item := range loadStrings(db, name) {
+			dl.PushBack(item)
+		}
 	}
 
 	var target, value string
@@ -269,11 +273,16 @@ func HandleDlist(command Command, db DB, name string, ss io.Reader) {
 		dl.PrintBackward()
 	}
 
-	items := []string{}
-	for current := dl.GetHead(); current != nil; current = current.Next {
-		items = append(items, current.Person)
+	if binaryMode {
+		db[name] = &Entry{Type: "dlist"}
+		dl.SaveBinary(binaryFile(name))
+	} else {
+		items := []string{}
+		for current := dl.GetHead(); current != nil; current = current.Next {
+			items = append(items, current.Person)
+		}
+		saveStrings(db, name, "dlist", items)
 	}
-	saveStrings(db, name, "dlist", items)
 }
 
 // SaveBinary сохраняет список в бинарный файл:

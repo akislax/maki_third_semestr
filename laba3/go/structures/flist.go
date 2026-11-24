@@ -193,8 +193,12 @@ func HandleFlist(command Command, db DB, name string, ss io.Reader) {
 	}
 
 	fl := NewFlist()
-	for _, item := range loadStrings(db, name) {
-		fl.AddTail(item)
+	if binaryMode {
+		fl.LoadBinary(binaryFile(name))
+	} else {
+		for _, item := range loadStrings(db, name) {
+			fl.AddTail(item)
+		}
 	}
 
 	var target, value string
@@ -258,11 +262,16 @@ func HandleFlist(command Command, db DB, name string, ss io.Reader) {
 		fl.PrintReverse()
 	}
 
-	items := []string{}
-	for current := fl.GetHead(); current != nil; current = current.Next {
-		items = append(items, current.Value)
+	if binaryMode {
+		db[name] = &Entry{Type: "flist"}
+		fl.SaveBinary(binaryFile(name))
+	} else {
+		items := []string{}
+		for current := fl.GetHead(); current != nil; current = current.Next {
+			items = append(items, current.Value)
+		}
+		saveStrings(db, name, "flist", items)
 	}
-	saveStrings(db, name, "flist", items)
 }
 
 // SaveBinary сохраняет список в бинарный файл:

@@ -233,12 +233,15 @@ void handleDlist(Command command, json& db, const string& name, stringstream& ss
     if (wrongType(db, name, "dlist")) return;
 
     Dlist dl;
+    if (binaryMode) dl.loadBinary(binaryFile(name));
+    else {
     if (db.contains(name))
     {
         for (auto& element : db[name]["data"])
         {
             dl.pushBack(element.get<string>());
         }
+    }
     }
 
     string target;
@@ -303,6 +306,8 @@ void handleDlist(Command command, json& db, const string& name, stringstream& ss
             break;
     }
 
+        if (binaryMode) { db[name]["type"] = "dlist"; dl.saveBinary(binaryFile(name)); }
+    else {
     json data = json::array();
     for (DNode* current = dl.getHead(); current != nullptr; current = current -> next)
     {
@@ -310,6 +315,7 @@ void handleDlist(Command command, json& db, const string& name, stringstream& ss
     }
     db[name]["type"] = "dlist";
     db[name]["data"] = data;
+    }
 
 }
 // сериализация: [количество] [строки от головы к хвосту]

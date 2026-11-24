@@ -9,7 +9,7 @@ import (
 	"laba3go/structures"
 )
 
-// handlePrint печатает любую структуру по имени, смотря на ее тип.
+// handlePrint печатает структуру любого типа по ее имени.
 func handlePrint(db structures.DB, name string, ss *strings.Reader) {
 	entry, ok := db[name]
 	if !ok {
@@ -38,20 +38,50 @@ func handlePrint(db structures.DB, name string, ss *strings.Reader) {
 }
 
 func main() {
-	if len(os.Args) != 5 {
-		fmt.Println("Использование: ./laba3go --file <файл> --query '<команда>'")
+	if len(os.Args) != 5 && len(os.Args) != 7 {
+		fmt.Println("Использование: ./laba3go --file <файл> [--format json|binary] --query '<команда>'")
 		os.Exit(1)
 	}
+	if os.Args[1] != "--file" {
+		fmt.Println("неверные параметры")
+		os.Exit(1)
+	}
+
 	fileName := os.Args[2]
-	query := os.Args[4]
+	format := "json"
+	var query string
+	if len(os.Args) == 5 {
+		if os.Args[3] != "--query" {
+			fmt.Println("неверные параметры")
+			os.Exit(1)
+		}
+		query = os.Args[4]
+	} else {
+		if os.Args[3] != "--format" || (os.Args[4] != "json" && os.Args[4] != "binary") || os.Args[5] != "--query" {
+			fmt.Println("неверные параметры")
+			os.Exit(1)
+		}
+		format = os.Args[4]
+		query = os.Args[6]
+	}
+
+	binary := format == "binary"
+	structures.SetBinaryMode(binary, fileName)
+	dbFile := fileName
+	if binary {
+		dbFile += ".meta.json"
+	}
 
 	db := structures.DB{}
-	content, err := os.ReadFile(fileName)
+	content, err := os.ReadFile(dbFile)
 	if err == nil && len(content) > 0 {
 		if err := json.Unmarshal(content, &db); err != nil {
 			fmt.Println("ошибка:", err)
 			os.Exit(1)
 		}
+	} else if err != nil && !os.IsNotExist(err) {
+		fmt.Println("ошибка:", err)
+		os.Exit(1)
 	}
 
 	ss := strings.NewReader(query)
@@ -91,8 +121,12 @@ func main() {
 		fmt.Println("неизвестная команда")
 	}
 
-	out, _ := json.MarshalIndent(db, "", "    ")
-	if err := os.WriteFile(fileName, append(out, '\n'), 0644); err != nil {
+	out, err := json.MarshalIndent(db, "", "    ")
+	if err != nil {
+		fmt.Println("ошибка:", err)
+		os.Exit(1)
+	}
+	if err := os.WriteFile(dbFile, append(out, '\n'), 0644); err != nil {
 		fmt.Println("ошибка:", err)
 		os.Exit(1)
 	}

@@ -186,8 +186,12 @@ func HandleTree(command Command, db DB, name string, ss io.Reader) {
 	}
 
 	tr := NewTree()
-	for _, key := range loadInts(db, name) {
-		tr.Insert(key)
+	if binaryMode {
+		tr.LoadBinary(binaryFile(name))
+	} else {
+		for _, key := range loadInts(db, name) {
+			tr.Insert(key)
+		}
 	}
 
 	var value int
@@ -224,7 +228,12 @@ func HandleTree(command Command, db DB, name string, ss io.Reader) {
 		fmt.Println()
 	}
 
-	saveInts(db, name, "tree", tr.bfsKeys())
+	if binaryMode {
+		db[name] = &Entry{Type: "tree"}
+		tr.SaveBinary(binaryFile(name))
+	} else {
+		saveInts(db, name, "tree", tr.bfsKeys())
+	}
 }
 
 // SaveBinary сохраняет дерево в бинарный файл:

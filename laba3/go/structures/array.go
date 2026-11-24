@@ -113,8 +113,12 @@ func HandleArray(command Command, db DB, name string, ss io.Reader) {
 	}
 
 	arr := NewArray()
-	for _, item := range loadStrings(db, name) {
-		arr.PushBack(item)
+	if binaryMode {
+		arr.LoadBinary(binaryFile(name))
+	} else {
+		for _, item := range loadStrings(db, name) {
+			arr.PushBack(item)
+		}
 	}
 
 	var index int
@@ -142,11 +146,16 @@ func HandleArray(command Command, db DB, name string, ss io.Reader) {
 		arr.PrintArray()
 	}
 
-	items := make([]string, 0, arr.Length())
-	for i := 0; i < arr.Length(); i++ {
-		items = append(items, arr.GetAt(i))
+	if binaryMode {
+		db[name] = &Entry{Type: "array"}
+		arr.SaveBinary(binaryFile(name))
+	} else {
+		items := make([]string, 0, arr.Length())
+		for i := 0; i < arr.Length(); i++ {
+			items = append(items, arr.GetAt(i))
+		}
+		saveStrings(db, name, "array", items)
 	}
-	saveStrings(db, name, "array", items)
 }
 
 // SaveBinary сохраняет массив в бинарный файл:

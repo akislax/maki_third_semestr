@@ -259,8 +259,12 @@ func HandleHash(command Command, db DB, name string, ss io.Reader) {
 	}
 
 	ht := NewHashTable()
-	for _, key := range loadInts(db, name) {
-		ht.Add(key)
+	if binaryMode {
+		ht.LoadBinary(binaryFile(name))
+	} else {
+		for _, key := range loadInts(db, name) {
+			ht.Add(key)
+		}
 	}
 
 	var value int
@@ -283,7 +287,12 @@ func HandleHash(command Command, db DB, name string, ss io.Reader) {
 		ht.Print()
 	}
 
-	saveInts(db, name, "hash", ht.GetAll())
+	if binaryMode {
+		db[name] = &Entry{Type: "hash"}
+		ht.SaveBinary(binaryFile(name))
+	} else {
+		saveInts(db, name, "hash", ht.GetAll())
+	}
 }
 
 // HandleKukushka выполняет команду над таблицей кукушки с именем name.
@@ -293,8 +302,12 @@ func HandleKukushka(command Command, db DB, name string, ss io.Reader) {
 	}
 
 	kt := NewKukushka()
-	for _, key := range loadInts(db, name) {
-		kt.Insert(key)
+	if binaryMode {
+		kt.LoadBinary(binaryFile(name))
+	} else {
+		for _, key := range loadInts(db, name) {
+			kt.Insert(key)
+		}
 	}
 
 	var value int
@@ -317,7 +330,12 @@ func HandleKukushka(command Command, db DB, name string, ss io.Reader) {
 		kt.Print()
 	}
 
-	saveInts(db, name, "kukushka", kt.GetAll())
+	if binaryMode {
+		db[name] = &Entry{Type: "kukushka"}
+		kt.SaveBinary(binaryFile(name))
+	} else {
+		saveInts(db, name, "kukushka", kt.GetAll())
+	}
 }
 
 // SaveBinary сохраняет таблицу в бинарный файл: количество ключей, затем ключи.

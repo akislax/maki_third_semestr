@@ -159,12 +159,10 @@ void handleTree(Command command, json& db, const string& name, stringstream& ss)
     if (wrongType(db, name, "tree")) return;
 
     Tree tr;
-    if (db.contains(name))
+    if (binaryMode) tr.loadBinary(binaryFile(name));
+    else if (db.contains(name))
     {
-        for (auto& element : db[name]["data"])
-        {
-            tr.insert(element.get<int>());
-        }
+        for (auto& element : db[name]["data"]) tr.insert(element.get<int>());
     }
 
     int value;
@@ -205,8 +203,8 @@ void handleTree(Command command, json& db, const string& name, stringstream& ss)
         if (node -> left != nullptr) ochered.push_back(node -> left);
         if (node -> right != nullptr) ochered.push_back(node -> right);
     }
-    db[name]["type"] = "tree";
-    db[name]["data"] = data;
+    if (binaryMode) { db[name]["type"] = "tree"; tr.saveBinary(binaryFile(name)); }
+    else { db[name]["type"] = "tree"; db[name]["data"] = data; }
 }
 
 // сериализация: [количество] [ключи в порядке обхода в ширину]

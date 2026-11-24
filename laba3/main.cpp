@@ -31,16 +31,48 @@ int main(int argc, char* argv[])
 {
     try
     {
-    if (argc != 5)
+    if (argc != 5 && argc != 7)
     {
-        cout << "Использование: ./laba3 --file <файл> --query '<команда>'\n";
+        cout << "Использование: ./laba3 --file <файл> [--format json|binary] --query '<команда>'\n";
         return 1;
     }
+
+    if (string(argv[1]) != "--file")
+    {
+        cout << "неверные параметры\n";
+        return 1;
+    }
+
     string fileName = argv[2];
-    string query = argv[4];
+    string query;
+    if (argc == 5)
+    {
+        if (string(argv[3]) != "--query")
+        {
+            cout << "неверные параметры\n";
+            return 1;
+        }
+        query = argv[4];
+        binaryMode = false;
+    }
+    else
+    {
+        if (string(argv[3]) != "--format" ||
+            (string(argv[4]) != "json" && string(argv[4]) != "binary") ||
+            string(argv[5]) != "--query")
+        {
+            cout << "неверные параметры\n";
+            return 1;
+        }
+        binaryMode = (string(argv[4]) == "binary");
+        query = argv[6];
+    }
+
+    binaryBase = fileName;
+    string dbFile = binaryMode ? fileName + ".meta.json" : fileName;
 
     json db = json::object();
-    ifstream in(fileName);
+    ifstream in(dbFile);
     if (in.is_open() && in.peek() != EOF)
     {
         db = json::parse(in);
@@ -78,7 +110,7 @@ int main(int argc, char* argv[])
         default: cout << "неизвестная команда\n"; break;
     }
 
-    ofstream out(fileName);
+    ofstream out(dbFile);
     out << db.dump(4) << "\n";
     out.close();
     }

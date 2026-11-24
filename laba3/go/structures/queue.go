@@ -81,8 +81,12 @@ func HandleQueue(command Command, db DB, name string, ss io.Reader) {
 	}
 
 	q := NewQueue()
-	for _, item := range loadStrings(db, name) {
-		q.Push(item)
+	if binaryMode {
+		q.LoadBinary(binaryFile(name))
+	} else {
+		for _, item := range loadStrings(db, name) {
+			q.Push(item)
+		}
 	}
 
 	var value string
@@ -102,11 +106,16 @@ func HandleQueue(command Command, db DB, name string, ss io.Reader) {
 		q.PrintQ()
 	}
 
-	items := []string{}
-	for current := q.GetHead(); current != nil; current = current.Next {
-		items = append(items, current.A)
+	if binaryMode {
+		db[name] = &Entry{Type: "queue"}
+		q.SaveBinary(binaryFile(name))
+	} else {
+		items := []string{}
+		for current := q.GetHead(); current != nil; current = current.Next {
+			items = append(items, current.A)
+		}
+		saveStrings(db, name, "queue", items)
 	}
-	saveStrings(db, name, "queue", items)
 }
 
 // SaveBinary сохраняет очередь в бинарный файл:

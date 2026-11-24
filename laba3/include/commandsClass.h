@@ -22,3 +22,6 @@ enum class Command
 
 Command toCommand(const string& text);
 bool wrongType(json& db, const string& name, const string& type);
+extern bool binaryMode;
+extern string binaryBase;
+string binaryFile(const string& name);

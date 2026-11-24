@@ -3,7 +3,23 @@ package structures
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 )
+
+var binaryMode bool
+var binaryBase string
+
+// SetBinaryMode включает или выключает бинарное хранение структур.
+func SetBinaryMode(enabled bool, base string) {
+	binaryMode = enabled
+	binaryBase = base
+}
+
+// binaryFile возвращает имя бинарного файла отдельной структуры.
+func binaryFile(name string) string {
+	safe := strings.NewReplacer("/", "_", "\\", "_").Replace(name)
+	return binaryBase + "." + safe + ".bin"
+}
 
 // Command - команда, которую ввел пользователь.
 type Command int
@@ -108,7 +124,7 @@ func ToCommand(text string) Command {
 // Entry - одна структура в файле базы: ее тип и данные.
 type Entry struct {
 	Type string          `json:"type"`
-	Data json.RawMessage `json:"data"`
+	Data json.RawMessage `json:"data,omitempty"`
 }
 
 // DB - вся база: имя структуры и ее запись.

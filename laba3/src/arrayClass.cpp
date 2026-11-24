@@ -123,12 +123,15 @@ void handleArray(Command command, json& db, const string& name, stringstream& ss
     if (wrongType(db, name, "array")) return;
 
     Array arr;
+    if (binaryMode) arr.loadBinary(binaryFile(name));
+    else {
     if (db.contains(name))
     {
         for (auto& element : db[name]["data"])
         {
             arr.pushBack(element.get<string>());
         }
+    }
     }
 
     int index;
@@ -166,6 +169,8 @@ void handleArray(Command command, json& db, const string& name, stringstream& ss
             break;
     }
 
+        if (binaryMode) { db[name]["type"] = "array"; arr.saveBinary(binaryFile(name)); }
+    else {
     json data = json::array();
     for (int i = 0; i < arr.lenght(); i++)
     {
@@ -173,6 +178,7 @@ void handleArray(Command command, json& db, const string& name, stringstream& ss
     }
     db[name]["type"] = "array";
     db[name]["data"] = data;
+    }
 }
 
 // сериализация: [количество] [строка] [строка] ...

@@ -1,20 +1,29 @@
 #pragma once
+#include <cstdint>
 #include <fstream>
 #include <string>
 
-// Общие функции для бинарной сериализации.
-// Число пишется как 4 байта, строка - как длина (число) + сами байты.
-
+// Число записывается как 4 байта в little-endian.
+// Строка: длина (4 байта), затем сами байты.
 inline void writeInt(std::ofstream& out, int value)
 {
-    out.write(reinterpret_cast<const char*>(&value), sizeof(value));
+    uint32_t number = static_cast<uint32_t>(value);
+    for (int i = 0; i < 4; i++)
+    {
+        out.put(static_cast<char>((number >> (i * 8)) & 0xFF));
+    }
 }
 
 inline int readInt(std::ifstream& in)
 {
-    int value = 0;
-    in.read(reinterpret_cast<char*>(&value), sizeof(value));
-    return value;
+    uint32_t number = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        int byte = in.get();
+        if (byte == EOF) return 0;
+        number |= static_cast<uint32_t>(static_cast<unsigned char>(byte)) << (i * 8);
+    }
+    return static_cast<int32_t>(number);
 }
 
 inline void writeString(std::ofstream& out, const std::string& text)
@@ -26,7 +35,8 @@ inline void writeString(std::ofstream& out, const std::string& text)
 inline std::string readString(std::ifstream& in)
 {
     int len = readInt(in);
-    std::string text(len, ' ');
-    in.read(text.data(), len);
+    if (len < 0) return "";
+    std::string text(static_cast<size_t>(len), '\0');
+    in.read(text.data(), static_cast<std::streamsize>(len));
     return text;
 }

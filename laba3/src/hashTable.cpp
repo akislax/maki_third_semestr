@@ -121,12 +121,10 @@ void handleHash(Command command, json& db, const string& name, stringstream& ss)
     if (wrongType(db, name, "hash")) return;
 
     hashTable ht;
-    if (db.contains(name))
+    if (binaryMode) ht.loadBinary(binaryFile(name));
+    else if (db.contains(name))
     {
-        for (auto& element : db[name]["data"])
-        {
-            ht.add(element.get<int>());
-        }
+        for (auto& element : db[name]["data"]) ht.add(element.get<int>());
     }
 
     int value;
@@ -158,8 +156,8 @@ void handleHash(Command command, json& db, const string& name, stringstream& ss)
     {
         data.push_back(key);
     }
-    db[name]["type"] = "hash";
-    db[name]["data"] = data;
+    if (binaryMode) { db[name]["type"] = "hash"; ht.saveBinary(binaryFile(name)); }
+    else { db[name]["type"] = "hash"; db[name]["data"] = data; }
 }
 
 Kukushka::Kukushka()
@@ -319,12 +317,10 @@ void handleKukushka(Command command, json& db, const string& name, stringstream&
     if (wrongType(db, name, "kukushka")) return;
 
     Kukushka kt;
-    if (db.contains(name))
+    if (binaryMode) kt.loadBinary(binaryFile(name));
+    else if (db.contains(name))
     {
-        for (auto& element : db[name]["data"])
-        {
-            kt.insert(element.get<int>());
-        }
+        for (auto& element : db[name]["data"]) kt.insert(element.get<int>());
     }
 
     int value;
@@ -356,8 +352,8 @@ void handleKukushka(Command command, json& db, const string& name, stringstream&
     {
         data.push_back(key);
     }
-    db[name]["type"] = "kukushka";
-    db[name]["data"] = data;
+    if (binaryMode) { db[name]["type"] = "kukushka"; kt.saveBinary(binaryFile(name)); }
+    else { db[name]["type"] = "kukushka"; db[name]["data"] = data; }
 }
 // сериализация цепочек: [количество] [ключи]
 // ячейку хранить не нужно - при загрузке add сам посчитает хеш

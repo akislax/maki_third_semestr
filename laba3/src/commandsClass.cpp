@@ -1,4 +1,9 @@
 #include "commandsClass.h"
+#include <algorithm>
+bool binaryMode = false;
+string binaryBase;
+string binaryFile(const string& name) { string safe = name; for (char& c : safe) if (c == '/' || c == '\\') c = '_'; return binaryBase + "." + safe + ".bin"; }
+
 
 Command toCommand(const string& text)
 {
