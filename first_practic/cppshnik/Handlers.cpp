@@ -36,7 +36,7 @@ void handleSet(Command command, const std::string &name, std::stringstream &ss, 
         {
             if (mySet.search(value))
             {
-                std::cout << "Элемент уже существует: " << '\n';
+                std::cout << "Элемент уже существует" << '\n';
             }
             else
             {
@@ -62,7 +62,7 @@ void handleSet(Command command, const std::string &name, std::stringstream &ss, 
             }
             else
             {
-                std::cout << "Элемент не найден: " << "\n";
+                std::cout << "Элемент не найден" << "\n";
             }
         }
     }
