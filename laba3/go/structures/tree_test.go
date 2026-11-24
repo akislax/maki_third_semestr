@@ -9,11 +9,11 @@ import (
 
 // fillTree строит дерево для тестов:
 //
-//	      5
-//	     / \
-//	    3   8
-//	   /
-//	  1
+//	    5
+//	   / \
+//	  3   8
+//	 /
+//	1
 func fillTree(tr *Tree) {
 	tr.Insert(5)
 	tr.Insert(3)

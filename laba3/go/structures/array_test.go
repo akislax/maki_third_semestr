@@ -121,11 +121,11 @@ func TestArrayHandlerAllCommands(t *testing.T) {
 	db := DB{}
 
 	captureOutput(func() {
-		HandleArray(MPUSH, db, "arr", args("a"))       // [a]
-		HandleArray(MPUSH, db, "arr", args("c"))       // [a, c]
-		HandleArray(MINSERT, db, "arr", args("1 b"))   // [a, b, c]
-		HandleArray(MSET, db, "arr", args("0 z"))      // [z, b, c]
-		HandleArray(MDEL, db, "arr", args("2"))        // [z, b]
+		HandleArray(MPUSH, db, "arr", args("a"))     // [a]
+		HandleArray(MPUSH, db, "arr", args("c"))     // [a, c]
+		HandleArray(MINSERT, db, "arr", args("1 b")) // [a, b, c]
+		HandleArray(MSET, db, "arr", args("0 z"))    // [z, b, c]
+		HandleArray(MDEL, db, "arr", args("2"))      // [z, b]
 		HandleArray(MGET, db, "arr", args("1"))
 		HandleArray(MLEN, db, "arr", args(""))
 		HandleArray(MPRINT, db, "arr", args(""))

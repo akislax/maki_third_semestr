@@ -130,8 +130,8 @@ func TestDlistPopName(t *testing.T) {
 	dl.PushBack("b")
 	dl.PushBack("c")
 
-	dl.PopName("a") // голова
-	dl.PopName("c") // хвост
+	dl.PopName("a")                                  // голова
+	dl.PopName("c")                                  // хвост
 	out := captureOutput(func() { dl.PopName("z") }) // такого нет
 
 	assert.Equal(t, "b <-> nil\n", forward(dl))
